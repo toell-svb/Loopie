@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CoreHabit Ultimate Pro</title>
+    <style>
+        /* ================= THEME CONFIGURATION ================= */
+        body.theme-dark-classic {
+            --bg-dark: #0f1115; --panel-bg: #161920; --panel-brd: #222733;
+            --text-main: #f3f4f6; --text-mut: #6c7a89; --accent: #3b82f6; --panel-done: #1c2330;
+            --chart-line: #3b82f6; --chart-grid: #222733; --color-empty: #242936;
+        }
+        body.theme-light-clean {
+            --bg-dark: #f8fafc; --panel-bg: #ffffff; --panel-brd: #e2e8f0;
+            --text-main: #0f172a; --text-mut: #64748b; --accent: #2563eb; --panel-done: #f1f5f9;
+            --chart-line: #2563eb; --chart-grid: #e2e8f0; --color-empty: #e2e8f0;
+        }
+        body.theme-cyber-neon {
+            --bg-dark: #05050a; --panel-bg: #0d0d1a; --panel-brd: #00ffcc;
+            --text-main: #00ffcc; --text-mut: #bd00ff; --accent: #ff007f; --panel-done: #1a0033;
+            --chart-line: #ff007f; --chart-grid: #331a4a; --color-empty: #1a0033;
+        }
+        body.theme-pastel-warm {
+            --bg-dark: #faf7f2; --panel-bg: #ffffff; --panel-brd: #eaddcd;
+            --text-main: #4338ca; --text-mut: #818cf8; --accent: #ec4899; --panel-done: #f5efe6;
+            --chart-line: #ec4899; --chart-grid: #eaddcd; --color-empty: #f5efe6;
+        }
+        body.theme-nordic-frost {
+            --bg-dark: #1e293b; --panel-bg: #334155; --panel-brd: #475569;
+            --text-main: #f8fafc; --text-mut: #94a3b8; --accent: #38bdf8; --panel-done: #1e293b;
+            --chart-line: #38bdf8; --chart-grid: #475569; --color-empty: #475569;
+        }
+
+        /* ================= BASE STYLES ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 95px; min-height: 100vh; transition: background 0.3s, color 0.3s; }
+        
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { font-size: 24px; font-weight: 700; background: linear-gradient(45deg, var(--accent), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 15px; color: var(--text-mut); margin: 25px 0 12px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--panel-brd); padding-bottom: 5px; }
+        
+        .card { background: var(--panel-bg); border: 1px solid var(--panel-brd); padding: 16px; border-radius: 16px; margin-bottom: 16px; }
+
+        /* ================= LEVEL SYSTEM & STATS ================= */
+        .level-box { background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1)); border: 1px solid var(--panel-brd); border-radius: 16px; padding: 14px; margin-bottom: 16px; }
+        .level-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; font-size: 13px; }
+        .xp-bar-bg { background: rgba(0,0,0,0.15); height: 8px; border-radius: 4px; overflow: hidden; }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #8b5cf6); width: 0%; transition: width 0.4s ease; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stats-triple-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-mini { background: var(--panel-bg); border: 1px solid var(--panel-brd); padding: 12px; border-radius: 12px; text-align: center; }
+        .stat-mini span { display: block; font-size: 11px; color: var(--text-mut); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .stat-mini strong { font-size: 17px; color: var(--text-main); font-weight: 700; }
+
+        /* ================= HABIT ITEMS (SPLIT LISTS) ================= */
+        .habit-item { display: flex; align-items: center; justify-content: space-between; background: var(--panel-bg); border: 1px solid var(--panel-brd); padding: 14px; border-radius: 14px; margin-bottom: 10px; transition: transform 0.2s, opacity 0.2s; }
+        .habit-item.completed { opacity: 0.55; background: var(--panel-done); border-color: transparent; }
+        .habit-info { display: flex; flex-direction: column; gap: 3px; }
+        .habit-title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 6px; }
+        
+        .badge { font-size: 9px; padding: 3px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .badge-neg { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .badge-flex { background: rgba(59, 130, 246, 0.15); color: var(--accent); }
+
+        .btn-check { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--panel-brd); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: transparent; font-weight: bold; transition: all 0.2s; }
+        .habit-item.completed .btn-check { border-color: #10b981; background: #10b981; color: white; }
+        .btn-check-neg { border-color: #ef4444; }
+        .habit-item.completed .btn-check-neg { border-color: #ef4444; background: #ef4444; }
+
+        /* ================= FORMS & 20-COLOR PICKER ================= */
+        input, select, button.btn-prime { width: 100%; background: var(--bg-dark); border: 1px solid var(--panel-brd); padding: 12px; border-radius: 10px; color: var(--text-main); margin-bottom: 12px; font-size: 14px; outline: none; }
+        button.btn-prime { background: var(--accent); color: white; font-weight: bold; border: none; cursor: pointer; transition: opacity 0.2s; }
+        button.btn-prime:active { opacity: 0.8; }
+
+        .color-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin: 10px 0 20px 0; }
+        .color-dot { width: 100%; aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s, border-color 0.1s; }
+        .color-dot.active { border-color: var(--text-main); transform: scale(1.2); }
+
+        /* ================= CALENDAR GRIDS (WEEK, MONTH, YEAR) ================= */
+        .timeframe-row { display: flex; background-color: var(--bg-dark); border: 1px solid var(--panel-brd); border-radius: 8px; margin-bottom: 15px; overflow: hidden; }
+        .timeframe-btn { flex: 1; background: none; border: none; color: var(--text-mut); padding: 10px 0; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .timeframe-btn.active { background-color: var(--panel-done); color: var(--accent); }
+
+        .week-grid { display: flex; justify-content: space-between; text-align: center; margin-top: 10px; }
+        .grid-day-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .grid-square { width: 35px; height: 35px; background-color: var(--color-empty); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+        
+        .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; margin-top: 10px;}
+        .month-header { font-size: 11px; font-weight: bold; color: var(--text-mut); padding-bottom: 5px; text-transform: uppercase;}
+        .month-day { font-size: 12px; padding: 8px 0; background-color: var(--color-empty); border-radius: 6px; font-weight: 600; position: relative; }
+        .month-day .dot { width: 4px; height: 4px; border-radius: 50%; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); }
+
+        .year-matrix { display: grid; grid-template-columns: repeat(20, 1fr); gap: 3px; margin-top: 10px;}
+        .year-square { aspect-ratio: 1; background-color: var(--color-empty); border-radius: 2px; }
+
+        /* ================= SVG WEIGHT CHART ================= */
+        .weight-chart-wrapper { background: var(--bg-dark); border-radius: 12px; padding: 15px 10px 10px 10px; margin-top: 10px; border: 1px solid var(--panel-brd); }
+        .weight-chart-axis-text { font-size: 10px; fill: var(--text-mut); font-weight: 600; }
+        .weight-chart-grid-line { stroke: var(--chart-grid); stroke-width: 1; stroke-dasharray: 4 4; }
+
+        /* ================= NAVIGATION ================= */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel-bg); border-top: 1px solid var(--panel-brd); display: flex; justify-content: space-around; padding: 12px 6px; max-width: 500px; margin: 0 auto; z-index: 100; }
+        .nav-item { background: none; border: none; color: var(--text-mut); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; width: 20%; font-weight: 600; text-transform: uppercase;}
+        .nav-item.active { color: var(--accent); }
+        .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
+
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; display: none; }
+    </style>
+</head>
+<body class="theme-dark-classic">
+
+    <canvas id="confetti"></canvas>
+
+    <div class="container">
+        
+        <div id="view-today" class="view active">
+            <header>
+                <h1 id="today-date">Heute</h1>
+                <div id="perfect-day-banner" style="display:none; color: #f59e0b; font-size: 12px; font-weight: bold; background: rgba(245, 158, 11, 0.15); padding: 4px 10px; border-radius: 12px;">✨ Perfekter Tag</div>
+            </header>
+
+            <div class="level-box">
+                <div class="level-header">
+                    <span id="txt-level">Level 1 Habit-Apprentice</span>
+                    <span id="txt-xp">0 / 100 XP</span>
+                </div>
+                <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-fill"></div></div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-mini"><span>Aktueller Streak</span><strong id="stat-streak">0 Tage</strong></div>
+                <div class="stat-mini"><span>All-Time Best</span><strong id="stat-best-streak">0 Tage</strong></div>
+            </div>
+
+            <h2>⏳ Zu erledigen</h2>
+            <div id="list-pending"></div>
+
+            <h2>✅ Erledigt</h2>
+            <div id="list-completed"></div>
+        </div>
+
+        <div id="view-calendar" class="view">
+            <header><h1>Analytics & Raster</h1></header>
+            
+            <div class="stats-triple-grid">
+                <div class="stat-mini"><span>Woche</span><strong id="cal-stat-week">0%</strong></div>
+                <div class="stat-mini"><span>Monat</span><strong id="cal-stat-month">0%</strong></div>
+                <div class="stat-mini"><span>Jahr</span><strong id="cal-stat-year">0%</strong></div>
+            </div>
+
+            <div class="card">
+                <div class="timeframe-row">
+                    <button class="timeframe-btn active" id="tf-Woche" onclick="switchTimeframe('Woche')">Woche</button>
+                    <button class="timeframe-btn" id="tf-Monat" onclick="switchTimeframe('Monat')">Monat</button>
+                    <button class="timeframe-btn" id="tf-Jahr" onclick="switchTimeframe('Jahr')">Jahr</button>
+                </div>
+                <h3 id="calendar-title" style="font-size:14px; margin-bottom:10px; color: var(--text-main);">Übersicht</h3>
+                <div id="calendar-render-zone"></div>
+            </div>
+        </div>
+
+        <div id="view-weight" class="view">
+            <header><h1>Gewichts-Kurve</h1></header>
+            <div class="card">
+                <label style="display:block; margin-bottom: 8px; font-size: 12px; font-weight:bold; color: var(--text-mut); text-transform:uppercase;">Neuer Eintrag (kg / lbs):</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="weight-input" step="0.1" placeholder="z.B. 75.5" style="margin:0;">
+                    <button class="btn-prime" onclick="addWeightLog()" style="width: auto; margin:0; padding: 0 16px;">Tracken</button>
+                </div>
+                
+                <div class="weight-chart-wrapper">
+                    <svg id="weight-line-svg" viewBox="0 0 400 180" style="width: 100%; height: auto; display: block; overflow: visible;"></svg>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-add" class="view">
+            <header><h1>Neues Habit</h1></header>
+            <div class="card">
+                <input type="text" id="habit-name" placeholder="Name der Gewohnheit...">
+                
+                <label style="font-size: 12px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; margin-top: 5px; display:block;">Modus:</label>
+                <select id="habit-mode" onchange="toggleFlexTarget()">
+                    <option value="normal">Standard (Täglich)</option>
+                    <option value="negative">Negativ (Aufhören / Vermeiden)</option>
+                    <option value="flex">Flexibel (Wochenziel)</option>
+                </select>
+
+                <div id="flex-target-box" style="display: none;">
+                    <label style="font-size: 12px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; display:block;">Frequenz pro Woche:</label>
+                    <select id="habit-flex-target">
+                        <option value="1">1-mal pro Woche</option>
+                        <option value="2">2-mal pro Woche</option>
+                        <option value="3">3-mal pro Woche</option>
+                        <option value="4">4-mal pro Woche</option>
+                        <option value="5">5-mal pro Woche</option>
+                        <option value="6">6-mal pro Woche</option>
+                    </select>
+                </div>
+
+                <label style="font-size: 12px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; display:block; margin-top: 10px;">Farbe wählen (20 Optionen):</label>
+                <div class="color-grid" id="color-picker-grid"></div>
+
+                <button class="btn-prime" onclick="createHabit()">Habit aktivieren</button>
+            </div>
+        </div>
+
+        <div id="view-settings" class="view">
+            <header><h1>Optionen</h1></header>
+            <div class="card">
+                <label style="font-size: 12px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; display:block; margin-bottom:6px;">App-Design / Theme:</label>
+                <select id="setting-theme" onchange="applyThemeSetting()">
+                    <option value="theme-dark-classic">Dunkel Klassisch (Standard)</option>
+                    <option value="theme-light-clean">Hell & Clean</option>
+                    <option value="theme-cyber-neon">Cyberpunk Neon</option>
+                    <option value="theme-pastel-warm">Sanftes Pastell</option>
+                    <option value="theme-nordic-frost">Nordisches Eis</option>
+                </select>
+
+                <label style="font-size: 12px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; display:block; margin-top:15px; margin-bottom:6px;">Tages-Reset Uhrzeit:</label>
+                <select id="setting-reset-time" onchange="saveSettings()">
+                    <option value="0">00:00 Uhr (Mitternacht)</option>
+                    <option value="2">02:00 Uhr morgens</option>
+                    <option value="3" selected>03:00 Uhr morgens</option>
+                    <option value="4">04:00 Uhr morgens</option>
+                    <option value="5">05:00 Uhr morgens</option>
+                </select>
+            </div>
+            
+            <div class="card">
+                <h3 style="font-size: 14px; margin-bottom: 10px;">Habit löschen</h3>
+                <div id="delete-list-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+
+            <button class="btn-prime" style="background:transparent; border: 1px solid #ef4444; color:#ef4444;" onclick="clearAllData()">Alle Daten restlos löschen</button>
+        </div>
+
+    </div>
+
+    <nav class="nav-bar">
+        <button class="nav-item active" onclick="switchView('today')">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            Heute
+        </button>
+        <button class="nav-item" onclick="switchView('calendar')">
+            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.11-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+            Kalender
+        </button>
+        <button class="nav-item" onclick="switchView('weight')">
+            <svg viewBox="0 0 24 24"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm1-17h-2v2h2V5zm0 4h-2v6h2V9zm0 8h-2v2h2v-2z"/></svg>
+            Gewicht
+        </button>
+        <button class="nav-item" onclick="switchView('add')">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Neu
+        </button>
+        <button class="nav-item" onclick="switchView('settings')">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></svg>
+            Setup
+        </button>
+    </nav>
+
+    <script>
+        // System Data Object
+        let appData = {
+            habits: [],
+            history: {}, 
+            weight: [], 
+            streak: 0,
+            bestStreak: 0,
+            xp: 0,
+            level: 1,
+            settings: { resetTime: 3, theme: 'theme-dark-classic' }
+        };
+
+        // 20 Premium Colors for Grid
+        const colorPalette = [
+            "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ec4899",
+            "#ef4444", "#00f0b5", "#00a8ff", "#9d4edd", "#4ecdc4",
+            "#ffe66d", "#1a8fe3", "#fb8500", "#2a9d8f", "#e76f51",
+            "#b5179e", "#72efdd", "#ccff33", "#ffccd5", "#95a5a6"
+        ];
+        let selectedColor = colorPalette[0];
+        let calendarTimeframe = 'Woche';
+
+        window.onload = function() {
+            if(localStorage.getItem('coreHabitDataPro')) {
+                const loaded = JSON.parse(localStorage.getItem('coreHabitDataPro'));
+                appData = { ...appData, ...loaded };
+                if(!appData.settings) appData.settings = { resetTime: 3, theme: 'theme-dark-classic' };
+                if(!appData.weight) appData.weight = [];
+            }
+            
+            document.getElementById('today-date').innerText = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'short' });
+            document.getElementById('setting-reset-time').value = appData.settings.resetTime || 3;
+            document.getElementById('setting-theme').value = appData.settings.theme || 'theme-dark-classic';
+            document.body.className = appData.settings.theme;
+
+            setupColorPicker();
+            checkDayReset();
+            renderAll();
+        }
+
+        function save() {
+            localStorage.setItem('coreHabitDataPro', JSON.stringify(appData));
+        }
+
+        function getLogicalDateStr(offsetDays = 0) {
+            const now = new Date();
+            if(offsetDays !== 0) now.setDate(now.getDate() - offsetDays);
+            const currentHour = now.getHours();
+            const boundary = appData.settings?.resetTime || 3;
+            if (currentHour < boundary) now.setDate(now.getDate() - 1);
+            return now.toISOString().split('T')[0];
+        }
+
+        function checkDayReset() {
+            const todayStr = getLogicalDateStr();
+            if (!appData.history[todayStr]) {
+                appData.history[todayStr] = [];
+                save();
+            }
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+            renderAll();
+        }
+
+        function switchTimeframe(tf) {
+            calendarTimeframe = tf;
+            document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tf-${tf}`).classList.add('active');
+            renderCalendarTab();
+        }
+
+        function setupColorPicker() {
+            const picker = document.getElementById('color-picker-grid');
+            picker.innerHTML = '';
+            colorPalette.forEach((c, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `color-dot ${idx===0?'active':''}`;
+                dot.style.backgroundColor = c;
+                dot.onclick = () => {
+                    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+                    dot.classList.add('active');
+                    selectedColor = c;
+                };
+                picker.appendChild(dot);
+            });
+        }
+
+        function toggleFlexTarget() {
+            const mode = document.getElementById('habit-mode').value;
+            document.getElementById('flex-target-box').style.display = mode === 'flex' ? 'block' : 'none';
+        }
+
+        function createHabit() {
+            const name = document.getElementById('habit-name').value.trim();
+            const mode = document.getElementById('habit-mode').value;
+            const flexTarget = parseInt(document.getElementById('habit-flex-target').value);
+
+            if(!name) return alert('Bitte gib einen Namen an!');
+
+            appData.habits.push({
+                id: 'h_' + Date.now(),
+                name: name,
+                color: selectedColor,
+                mode: mode,
+                flexTarget: mode === 'flex' ? flexTarget : 1
+            });
+            
+            save();
+            document.getElementById('habit-name').value = '';
+            switchView('today');
+        }
+
+        function deleteHabit(id) {
+            if(confirm("Möchtest du dieses Habit wirklich löschen? Historische Daten bleiben im Hintergrund erhalten, aber es wird ausgeblendet.")) {
+                appData.habits = appData.habits.filter(h => h.id !== id);
+                save();
+                renderAll();
+            }
+        }
+
+        function toggleHabit(id) {
+            const todayStr = getLogicalDateStr();
+            if(!appData.history[todayStr]) appData.history[todayStr] = [];
+
+            const idx = appData.history[todayStr].indexOf(id);
+            if(idx > -1) {
+                appData.history[todayStr].splice(idx, 1);
+                appData.xp = Math.max(0, appData.xp - 15);
+            } else {
+                appData.history[todayStr].push(id);
+                appData.xp += 15;
+            }
+            
+            appData.level = Math.floor(appData.xp / 100) + 1;
+            save();
+            recalcStreaks();
+            renderAll();
+        }
+
+        function recalcStreaks() {
+            const todayStr = getLogicalDateStr();
+            const doneToday = appData.habits.every(h => {
+                const checked = appData.history[todayStr]?.includes(h.id);
+                return h.mode === 'negative' ? !checked : checked;
+            });
+
+            if(doneToday && appData.habits.length > 0) {
+                triggerConfetti();
+                document.getElementById('perfect-day-banner').style.display = 'block';
+            } else {
+                document.getElementById('perfect-day-banner').style.display = 'none';
+            }
+
+            let currentCount = 0;
+            let dates = Object.keys(appData.history).sort().reverse();
+            for(let d of dates) {
+                let allDone = appData.habits.every(h => {
+                    let c = appData.history[d]?.includes(h.id);
+                    return h.mode === 'negative' ? !c : c;
+                });
+                if(allDone && appData.habits.length > 0) currentCount++;
+                else if (d !== todayStr) break; 
+            }
+
+            appData.streak = currentCount;
+            if(appData.streak > appData.bestStreak) appData.bestStreak = appData.streak;
+            save();
+        }
+
+        function calculateDaySuccessRate(dateStr) {
+            if(appData.habits.length === 0) return 0;
+            let done = 0;
+            appData.habits.forEach(h => {
+                const checked = appData.history[dateStr]?.includes(h.id) || false;
+                if(h.mode === 'negative' ? !checked : checked) done++;
+            });
+            return (done / appData.habits.length);
+        }
+
+        // ================= MAIN RENDER ENGINE =================
+        function renderAll() {
+            const todayStr = getLogicalDateStr();
+            const pendingList = document.getElementById('list-pending');
+            const completedList = document.getElementById('list-completed');
+            const delList = document.getElementById('delete-list-container');
+            
+            pendingList.innerHTML = ''; completedList.innerHTML = ''; delList.innerHTML = '';
+
+            // XP / Level Updates
+            const lvlNames = ["Ranger", "Routine-Hunter", "Pathfinder", "Overlord", "Grandmaster"];
+            document.getElementById('txt-level').innerText = `Lvl ${appData.level} ${lvlNames[Math.min(appData.level-1, 4)]}`;
+            const currentXPInLevel = appData.xp % 100;
+            document.getElementById('txt-xp').innerText = `${currentXPInLevel} / 100 XP`;
+            document.getElementById('xp-fill').style.width = `${currentXPInLevel}%`;
+
+            document.getElementById('stat-streak').innerText = `${appData.streak} Tage`;
+            document.getElementById('stat-best-streak').innerText = `${appData.bestStreak} Tage`;
+
+            appData.habits.forEach(h => {
+                const isChecked = appData.history[todayStr]?.includes(h.id) || false;
+                const isCompletedVisual = h.mode === 'negative' ? !isChecked : isChecked;
+
+                const item = document.createElement('div');
+                item.className = `habit-item ${isCompletedVisual ? 'completed' : ''}`;
+                item.style.borderLeft = `5px solid ${h.color}`;
+
+                let badgeText = '';
+                if(h.mode === 'negative') badgeText = '<span class="badge badge-neg">Nicht tun</span>';
+                if(h.mode === 'flex') badgeText = `<span class="badge badge-flex">${h.flexTarget}/Woche</span>`;
+
+                item.innerHTML = `
+                    <div class="habit-info">
+                        <div class="habit-title">${h.name} ${badgeText}</div>
+                        <div class="habit-meta">${isCompletedVisual ? 'Erledigt (+15 XP)' : 'Offen'}</div>
+                    </div>
+                    <button class="btn-check ${h.mode==='negative'?'btn-check-neg':''}" onclick="toggleHabit('${h.id}')">✓</button>
+                `;
+
+                if (isCompletedVisual) completedList.appendChild(item);
+                else pendingList.appendChild(item);
+
+                // Settings Delete List Render
+                delList.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; background:var(--bg-dark); padding:10px; border-radius:8px; align-items:center;">
+                        <span style="font-size:14px; font-weight:bold;">${h.name}</span>
+                        <button onclick="deleteHabit('${h.id}')" style="background:transparent; border:none; color:#ef4444; cursor:pointer;">🗑 Löschen</button>
+                    </div>`;
+            });
+
+            if(pendingList.innerHTML === '') pendingList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">🎉 Perfekt! Alles geschafft.</p>';
+            if(completedList.innerHTML === '') completedList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">Noch keine Tasks absolviert.</p>';
+
+            renderCalendarTab();
+            renderWeightLineChart();
+        }
+
+        // ================= CALENDAR ENGINE =================
+        function renderCalendarTab() {
+            // Percent Calculations
+            let ratesWeek = 0, ratesMonth = 0, ratesYear = 0;
+            for(let i=0; i<7; i++) ratesWeek += calculateDaySuccessRate(getLogicalDateStr(i));
+            for(let i=0; i<30; i++) ratesMonth += calculateDaySuccessRate(getLogicalDateStr(i));
+            for(let i=0; i<365; i++) ratesYear += calculateDaySuccessRate(getLogicalDateStr(i));
+
+            document.getElementById('cal-stat-week').innerText = `${Math.round((ratesWeek/7)*100)}%`;
+            document.getElementById('cal-stat-month').innerText = `${Math.round((ratesMonth/30)*100)}%`;
+            document.getElementById('cal-stat-year').innerText = `${Math.round((ratesYear/365)*100)}%`;
+
+            const zone = document.getElementById('calendar-render-zone');
+            zone.innerHTML = '';
+            const now = new Date();
+
+            if (calendarTimeframe === 'Woche') {
+                document.getElementById('calendar-title').innerText = "Wochenraster";
+                let weekHTML = `<div class="week-grid">`;
+                const tageNamen = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+                
+                let startWoche = new Date(now);
+                let tagesIndex = now.getDay() === 0 ? 6 : now.getDay() - 1;
+                startWoche.setDate(now.getDate() - tagesIndex);
+
+                for(let i=0; i<7; i++) {
+                    let d = new Date(startWoche);
+                    d.setDate(startWoche.getDate() + i);
+                    let dStr = d.toISOString().split('T')[0];
+                    let score = calculateDaySuccessRate(dStr);
+                    
+                    let bg = 'var(--color-empty)';
+                    if(score >= 1.0) bg = 'rgba(16, 185, 129, 0.2)';
+                    else if(score > 0) bg = 'rgba(245, 158, 11, 0.2)';
+
+                    weekHTML += `
+                        <div class="grid-day-col">
+                            <div style="font-size:11px; color:var(--text-mut);">${tageNamen[i]}</div>
+                            <div class="grid-square" style="background-color:${bg}; color:${score>=1.0?'#10b981':(score>0?'#f59e0b':'var(--text-mut)')}">${Math.round(score*100)}%</div>
+                        </div>
+                    `;
+                }
+                weekHTML += `</div>`;
+                zone.innerHTML = weekHTML;
+
+            } else if (calendarTimeframe === 'Monat') {
+                document.getElementById('calendar-title').innerText = now.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+                
+                let monthHTML = `<div class="month-grid">`;
+                ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].forEach(t => monthHTML += `<div class="month-header">${t}</div>`);
+                
+                let startOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+                for(let o=0; o<startOffset; o++) monthHTML += `<div></div>`;
+
+                for(let i = 1; i <= daysInMonth; i++) {
+                    const dateObj = new Date(now.getFullYear(), now.getMonth(), i);
+                    const dateStr = dateObj.toISOString().split('T')[0];
+                    const score = calculateDaySuccessRate(dateStr);
+
+                    let bg = 'var(--color-empty)'; let dotColor = 'transparent';
+                    if(score >= 1.0) { bg = 'rgba(16, 185, 129, 0.15)'; dotColor = '#10b981'; }
+                    else if(score > 0) { bg = 'rgba(245, 158, 11, 0.15)'; dotColor = '#f59e0b'; }
+                    else if (appData.history[dateStr]) { bg = 'rgba(239, 68, 68, 0.1)'; dotColor = '#ef4444'; }
+
+                    monthHTML += `<div class="month-day" style="background-color:${bg}">${i}<div class="dot" style="background-color:${dotColor}"></div></div>`;
+                }
+                monthHTML += `</div>`;
+                zone.innerHTML = monthHTML;
+
+            } else if (calendarTimeframe === 'Jahr') {
+                document.getElementById('calendar-title').innerText = `Jahresübersicht ${now.getFullYear()}`;
+                let jahr = now.getFullYear();
+                let startJahr = new Date(jahr, 0, 1);
+                let endJahr = new Date(jahr + 1, 0, 0);
+                let tageImJahr = Math.floor((endJahr - startJahr) / (1000*60*60*24)) + 1;
+
+                let yearHTML = `<div class="year-matrix">`;
+                for(let t=0; t<tageImJahr; t++) {
+                    let curD = new Date(jahr, 0, 1 + t);
+                    let dStr = curD.toISOString().split('T')[0];
+                    let score = calculateDaySuccessRate(dStr);
+
+                    let bg = 'var(--color-empty)';
+                    if(score >= 1.0) bg = '#10b981';
+                    else if(score > 0) bg = '#f59e0b';
+
+                    yearHTML += `<div class="year-square" style="background-color:${bg}; opacity: ${score===0 ? 0.3 : 0.8};" title="${dStr}"></div>`;
+                }
+                yearHTML += `</div>`;
+                zone.innerHTML = yearHTML;
+            }
+        }
+
+        // ================= SVG LINE CHART ENGINE =================
+        function addWeightLog() {
+            const val = parseFloat(document.getElementById('weight-input').value);
+            if(!val || isNaN(val)) return alert('Wert ungültig');
+            appData.weight.push({ date: new Date().toLocaleDateString('de-DE', {day: '2-digit', month: 'short'}), value: val });
+            save();
+            document.getElementById('weight-input').value = '';
+            renderAll();
+        }
+
+        function renderWeightLineChart() {
+            const svg = document.getElementById('weight-line-svg');
+            svg.innerHTML = '';
+
+            if(!appData.weight || appData.weight.length === 0) {
+                svg.innerHTML = `<text x="200" y="90" text-anchor="middle" fill="var(--text-mut)" font-size="12">Keine Gewichtsdaten vorhanden</text>`;
+                return;
+            }
+
+            const logs = appData.weight.slice(-10); // Show last 10 entries
+            const values = logs.map(l => l.value);
+            let minVal = Math.min(...values); let maxVal = Math.max(...values);
+            
+            if (minVal === maxVal) { minVal -= 5; maxVal += 5; } 
+            else { const buffer = (maxVal - minVal) * 0.2; minVal -= buffer; maxVal += buffer; }
+
+            const svgW = 400, svgH = 180;
+            const padLeft = 45, padRight = 20, padTop = 20, padBottom = 30;
+            const graphW = svgW - padLeft - padRight;
+            const graphH = svgH - padTop - padBottom;
+
+            const steps = 3;
+            for(let i = 0; i <= steps; i++) {
+                const yVal = maxVal - ((maxVal - minVal) / steps) * i;
+                const yPos = padTop + (graphH / steps) * i;
+
+                const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                gridLine.setAttribute("x1", padLeft); gridLine.setAttribute("y1", yPos);
+                gridLine.setAttribute("x2", svgW - padRight); gridLine.setAttribute("y2", yPos);
+                gridLine.className.baseValue = "weight-chart-grid-line";
+                svg.appendChild(gridLine);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", padLeft - 8); text.setAttribute("y", yPos + 3);
+                text.setAttribute("text-anchor", "end");
+                text.className.baseValue = "weight-chart-axis-text";
+                text.textContent = `${Math.round(yVal)}`;
+                svg.appendChild(text);
+            }
+
+            const points = [];
+            logs.forEach((log, index) => {
+                const x = padLeft + (logs.length > 1 ? (graphW / (logs.length - 1)) * index : graphW / 2);
+                const y = padTop + graphH * (1 - (log.value - minVal) / (maxVal - minVal));
+                points.push({ x, y, date: log.date, val: log.value });
+            });
+
+            if(points.length > 1) {
+                let dPath = `M ${points[0].x} ${points[0].y}`;
+                for(let i = 1; i < points.length; i++) dPath += ` L ${points[i].x} ${points[i].y}`;
+                const polyline = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                polyline.setAttribute("d", dPath); polyline.setAttribute("fill", "none");
+                polyline.setAttribute("stroke", "var(--chart-line)"); polyline.setAttribute("stroke-width", "3");
+                polyline.setAttribute("stroke-linecap", "round"); polyline.setAttribute("stroke-linejoin", "round");
+                svg.appendChild(polyline);
+            }
+
+            points.forEach((p, index) => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", p.x); circle.setAttribute("cy", p.y);
+                circle.setAttribute("r", "5"); circle.setAttribute("fill", "var(--bg-dark)");
+                circle.setAttribute("stroke", "var(--chart-line)"); circle.setAttribute("stroke-width", "3");
+                svg.appendChild(circle);
+
+                const valTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                valTxt.setAttribute("x", p.x); valTxt.setAttribute("y", p.y - 12);
+                valTxt.setAttribute("text-anchor", "middle"); valTxt.setAttribute("fill", "var(--text-main)");
+                valTxt.setAttribute("font-size", "10"); valTxt.setAttribute("font-weight", "bold");
+                valTxt.textContent = p.val;
+                svg.appendChild(valTxt);
+
+                if(logs.length <= 5 || index % 2 === 0 || index === logs.length - 1) {
+                    const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    lbl.setAttribute("x", p.x); lbl.setAttribute("y", svgH - padBottom + 18);
+                    lbl.setAttribute("text-anchor", "middle"); lbl.className.baseValue = "weight-chart-axis-text";
+                    lbl.textContent = p.date;
+                    svg.appendChild(lbl);
+                }
+            });
+        }
+
+        // ================= SETTINGS & EFFECTS =================
+        function applyThemeSetting() {
+            const t = document.getElementById('setting-theme').value;
+            document.body.className = t;
+            appData.settings.theme = t;
+            save(); renderAll();
+        }
+
+        function saveSettings() {
+            appData.settings.resetTime = parseInt(document.getElementById('setting-reset-time').value);
+            save();
+        }
+
+        function clearAllData() {
+            if(confirm('Möchtest du wirklich alle Daten restlos löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.')) {
+                localStorage.removeItem('coreHabitDataPro');
+                location.reload();
+            }
+        }
+
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            canvas.style.display = 'block';
+
+            let p = Array.from({length: 80}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                r: Math.random() * 5 + 3, d: Math.random() * canvas.height,
+                color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
+                tilt: Math.random() * 10 - 5
+            }));
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                p.forEach(particle => {
+                    ctx.beginPath(); ctx.lineWidth = particle.r; ctx.strokeStyle = particle.color;
+                    ctx.moveTo(particle.x + particle.tilt + particle.r/2, particle.y);
+                    ctx.lineTo(particle.x + particle.tilt, particle.y + particle.tilt + particle.r/2);
+                    ctx.stroke();
+                });
+                let active = false;
+                p.forEach(particle => {
+                    particle.y += Math.cos(particle.d) + 1 + particle.r/2;
+                    if (particle.y < canvas.height) active = true;
+                });
+                if(active) requestAnimationFrame(draw); else canvas.style.display = 'none';
+            }
+            draw();
+        }
+    </script>
+</body>
+</html>
