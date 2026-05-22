@@ -8,8 +8,6 @@
         /* ================= THEME CONFIGURATION ================= */
         body.theme-dark-classic { --bg-dark: #0f1115; --panel-bg: #161920; --panel-brd: #222733; --text-main: #f3f4f6; --text-mut: #6c7a89; --accent: #3b82f6; --panel-done: #1c2330; --chart-line: #3b82f6; --chart-grid: #222733; --color-empty: #242936; }
         body.theme-light-clean { --bg-dark: #f8fafc; --panel-bg: #ffffff; --panel-brd: #e2e8f0; --text-main: #0f172a; --text-mut: #64748b; --accent: #2563eb; --panel-done: #f1f5f9; --chart-line: #2563eb; --chart-grid: #e2e8f0; --color-empty: #e2e8f0; }
-        body.theme-cyber-neon { --bg-dark: #05050a; --panel-bg: #0d0d1a; --panel-brd: #00ffcc; --text-main: #00ffcc; --text-mut: #bd00ff; --accent: #ff007f; --panel-done: #1a0033; --chart-line: #ff007f; --chart-grid: #331a4a; --color-empty: #1a0033; }
-        body.theme-pastel-warm { --bg-dark: #faf7f2; --panel-bg: #ffffff; --panel-brd: #eaddcd; --text-main: #4338ca; --text-mut: #818cf8; --accent: #ec4899; --panel-done: #f5efe6; --chart-line: #ec4899; --chart-grid: #eaddcd; --color-empty: #f5efe6; }
         body.theme-nordic-frost { --bg-dark: #1e293b; --panel-bg: #334155; --panel-brd: #475569; --text-main: #f8fafc; --text-mut: #94a3b8; --accent: #38bdf8; --panel-done: #1e293b; --chart-line: #38bdf8; --chart-grid: #475569; --color-empty: #475569; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -221,7 +219,7 @@
                     <input type="number" id="habit-target" value="1" min="1" style="margin-bottom:0;">
                 </div>
 
-                <label style="font-size: 11px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; display:block;">Farbe:</label>
+                <label style="font-size: 11px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; display:block;">Habit-Farbe:</label>
                 <div class="color-grid" id="color-picker-grid"></div>
 
                 <button class="btn-prime" onclick="createHabit()">Habit hinzufügen</button>
@@ -233,12 +231,18 @@
                 <select id="setting-theme" onchange="applyThemeSetting()">
                     <option value="theme-dark-classic">Dunkel Klassisch</option>
                     <option value="theme-light-clean">Hell & Clean</option>
-                    <option value="theme-cyber-neon">Cyberpunk Neon</option>
-                    <option value="theme-pastel-warm">Sanftes Pastell</option>
                     <option value="theme-nordic-frost">Nordisches Eis</option>
                 </select>
 
-                <label style="font-size:11px; font-weight:bold; color:var(--text-mut); text-transform:uppercase;">Nacht-Reset Uhrzeit:</label>
+                <!-- Custom Color Feature -->
+                <h3 style="margin-top: 20px; margin-bottom:12px; font-size:14px; border-bottom: 1px solid var(--panel-brd); padding-bottom: 5px;">🎨 Eigene App-Farben (Optional)</h3>
+                <label style="font-size:11px; font-weight:bold; color:var(--text-mut); text-transform:uppercase;">Hintergrundfarbe:</label>
+                <div class="color-grid" id="bg-color-picker"></div>
+                <label style="font-size:11px; font-weight:bold; color:var(--text-mut); text-transform:uppercase; margin-top:5px; display:block;">Akzentfarbe (Details):</label>
+                <div class="color-grid" id="accent-color-picker"></div>
+                <button class="btn-prime" onclick="resetCustomColors()" style="margin-top:5px; background:var(--panel-brd); color:var(--text-main);">Eigene Farben zurücksetzen</button>
+
+                <label style="font-size:11px; font-weight:bold; color:var(--text-mut); text-transform:uppercase; margin-top:20px; display:block;">Nacht-Reset Uhrzeit:</label>
                 <select id="setting-reset-time" onchange="saveSettings()">
                     <option value="0">00:00 Uhr (Mitternacht)</option>
                     <option value="2">02:00 Uhr morgens</option>
@@ -275,7 +279,7 @@
         let appData = { habits: [], history: {}, weight: [], emotes: [], jokers: 0, streak: 0, bestStreak: 0, xp: 0, level: 1, settings: { resetTime: 3, theme: 'theme-dark-classic' } };
         
         const colorPalette = ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ec4899", "#ef4444", "#00f0b5", "#00a8ff", "#9d4edd", "#4ecdc4", "#ffe66d", "#1a8fe3", "#fb8500", "#2a9d8f", "#e76f51", "#b5179e", "#72efdd", "#ccff33", "#ffccd5", "#95a5a6"];
-        const emotePool = ['🦄','🍕','🚀','👑','💎','👻','👽','🤖','💩','🍔','🍟','🍩','🍺','🎸','🕹️','🎲','🧩','🏆','🔥','⚡','🌈','🍀','🍄','🦖','🐉','🐙','🐼','🦊','🐵','🐧','🦉','🦇','🦈','🐊','🌵','🌻','🍉','🍒','🍓','🥑','🥨','🌮','🍣','🍭','🍿','🛹','🛸','穩','🚁','⛺','🧭'];
+        const emotePool = ['🦄','🍕','🚀','👑','💎','👻','👽','🤖','💩','🍔','🍟','🍩','🍺','🎸','🕹️','🎲','🧩','🏆','🔥','⚡','🌈','🍀','🍄','🦖','🐉','🐙','🐼','🦊','🐵','🐧','🦉','🦇','🦈','🐊','🌵','🌻','🍉','🍒','🍓','🥑','🥨','🌮','🍣','🍭','🍿','🛹','🛸','👽','🚁','⛺','🧭'];
         
         let selectedColor = colorPalette[0];
         let calendarTimeframe = 'Woche';
@@ -305,10 +309,20 @@
             
             document.getElementById('today-date').innerText = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'short' });
             document.getElementById('setting-reset-time').value = appData.settings.resetTime;
-            document.getElementById('setting-theme').value = appData.settings.theme;
-            document.body.className = appData.settings.theme;
+            
+            if(document.getElementById('setting-theme').querySelector(`option[value="${appData.settings.theme}"]`)) {
+                document.getElementById('setting-theme').value = appData.settings.theme;
+            } else {
+                appData.settings.theme = 'theme-dark-classic';
+                document.getElementById('setting-theme').value = 'theme-dark-classic';
+            }
+            applyThemeSetting();
 
-            setupColorPicker(); checkDayReset(); updateCalDropdown(); renderAll();
+            setupColorPicker(); 
+            setupCustomColorPickers();
+            checkDayReset(); 
+            updateCalDropdown(); 
+            renderAll();
         }
 
         function save() { localStorage.setItem('coreHabitDataPro', JSON.stringify(appData)); }
@@ -342,7 +356,7 @@
             colorPalette.forEach((c, idx) => {
                 const dot = document.createElement('div');
                 dot.className = `color-dot ${idx===0?'active':''}`; dot.style.backgroundColor = c;
-                dot.onclick = () => { document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active')); dot.classList.add('active'); selectedColor = c; };
+                dot.onclick = () => { document.querySelectorAll('#color-picker-grid .color-dot').forEach(d => d.classList.remove('active')); dot.classList.add('active'); selectedColor = c; };
                 picker.appendChild(dot);
             });
         }
@@ -381,8 +395,25 @@
             switchView('today');
         }
 
+        function getFirstUsedDate(habitId) {
+            let firstDate = null;
+            for (let dateStr in appData.history) {
+                let task = appData.history[dateStr][habitId];
+                // Wir betrachten eine Task als "genutzt", sobald sie einmal positiv beeinflusst wurde.
+                if (task && (task.done === true || task.val > 0 || task.joker === true)) {
+                    if (!firstDate || dateStr < firstDate) firstDate = dateStr;
+                }
+            }
+            return firstDate;
+        }
+
         function getHabitStatus(h, dateStr) {
-            if (dateStr > getLogicalDateStr() || dateStr < h.createdAt) return null; 
+            if (dateStr > getLogicalDateStr()) return null; 
+            
+            // Check für Kalender-Start (Nicht anzeigen bevor das erste Mal genutzt)
+            const firstUsed = getFirstUsedDate(h.id);
+            if (firstUsed && dateStr < firstUsed) return null; 
+            if (!firstUsed && dateStr !== getLogicalDateStr()) return null; // Falls nie genutzt, bleibt Historie leer
             
             const dayRecord = appData.history[dateStr];
             const task = dayRecord ? dayRecord[h.id] : null;
@@ -425,15 +456,26 @@
             }
 
             const isCompletedNow = getHabitStatus(h, todayStr);
+            
             if(!wasCompleted && isCompletedNow && h.mode !== 'negative') {
                 appData.xp += 15;
                 if(Math.random() < 0.25 && appData.emotes.length < 20) {
                     const e = emotePool[Math.floor(Math.random() * emotePool.length)];
                     appData.emotes.push(e);
+                    task.earnedEmote = e; // Tag the earned emote to this task today
                     showEmoteModal(e);
                 }
             } else if (wasCompleted && !isCompletedNow && h.mode !== 'negative') {
                 appData.xp = Math.max(0, appData.xp - 15);
+                // Anti-Cheat: Remove the exactly earned emote if unchecked
+                if (task.earnedEmote) {
+                    const emoteIdx = appData.emotes.lastIndexOf(task.earnedEmote);
+                    if(emoteIdx > -1) {
+                        appData.emotes.splice(emoteIdx, 1);
+                        selectedFusionEmotes = []; // Reset selection to prevent UI bugs
+                    }
+                    delete task.earnedEmote; // Remove tag
+                }
             }
 
             appData.level = Math.floor(appData.xp / 100) + 1;
@@ -453,6 +495,26 @@
             const m = document.getElementById('emote-modal');
             document.getElementById('emote-display').innerText = e;
             m.style.display = 'flex';
+        }
+
+        function getIndividualStreak(h) {
+            let count = 0;
+            let checkDate = new Date();
+            if(checkDate.getHours() < (appData.settings.resetTime||3)) checkDate.setDate(checkDate.getDate() - 1);
+            let todayStr = checkDate.toISOString().split('T')[0];
+
+            let statToday = getHabitStatus(h, todayStr);
+            if (statToday === true) count++;
+            
+            checkDate.setDate(checkDate.getDate() - 1);
+            while(true) {
+                let dStr = checkDate.toISOString().split('T')[0];
+                let stat = getHabitStatus(h, dStr);
+                if(stat === true) count++;
+                else if (stat === false || stat === null) break;
+                checkDate.setDate(checkDate.getDate() - 1);
+            }
+            return count;
         }
 
         function recalcStreaks() {
@@ -508,9 +570,13 @@
                 item.className = `habit-item ${isCompleted ? 'completed' : ''}`;
                 item.style.borderLeft = `5px solid ${h.color}`;
 
-                let badge = ''; let taskRec = appData.history[todayStr]?.[h.id];
-                if(h.mode === 'negative') badge = '<span class="badge badge-neg">Nicht tun</span>';
-                if(h.mode === 'flex') badge = `<span class="badge badge-flex">Ziel: ${h.target}/Woche</span>`;
+                let badge = ''; 
+                const hStreak = getIndividualStreak(h);
+                if(hStreak > 0) badge += `<span style="font-size: 11px; color: #f59e0b; margin-left: 4px; font-weight: bold;">(🔥 ${hStreak})</span> `;
+                
+                let taskRec = appData.history[todayStr]?.[h.id];
+                if(h.mode === 'negative') badge += '<span class="badge badge-neg">Nicht tun</span>';
+                if(h.mode === 'flex') badge += `<span class="badge badge-flex">Ziel: ${h.target}/Woche</span>`;
                 if(taskRec?.joker) badge += ' <span class="badge badge-joker">Joker aktiv</span>';
 
                 let controlsHTML = '';
@@ -685,7 +751,11 @@
                 let dStr = `${checkD.getFullYear()}-${String(checkD.getMonth()+1).padStart(2,'0')}-${String(checkD.getDate()).padStart(2,'0')}`;
                 let st = getHabitStatus(habit, dStr);
                 if(st === true) curStrk++; else if(st === false) break;
-                if(dStr < habit.createdAt) break;
+                
+                const fUsed = getFirstUsedDate(habit.id);
+                if(fUsed && dStr <= fUsed) break;
+                if(!fUsed) break;
+
                 checkD.setDate(checkD.getDate() - 1);
             }
 
@@ -736,8 +806,58 @@
             });
         }
 
-        // ================= SETTINGS =================
-        function applyThemeSetting() { const t = document.getElementById('setting-theme').value; document.body.className = t; appData.settings.theme = t; save(); }
+        // ================= SETTINGS & CUSTOM COLORS =================
+        function setupCustomColorPickers() {
+            const bgPicker = document.getElementById('bg-color-picker');
+            const acPicker = document.getElementById('accent-color-picker');
+            if(!bgPicker || !acPicker) return;
+            bgPicker.innerHTML = '';
+            acPicker.innerHTML = '';
+
+            colorPalette.forEach(c => {
+                const bgDot = document.createElement('div');
+                bgDot.className = `color-dot ${appData.settings.customBg === c ? 'active' : ''}`;
+                bgDot.style.backgroundColor = c;
+                bgDot.onclick = () => { appData.settings.customBg = c; save(); setupCustomColorPickers(); applyThemeSetting(); };
+                bgPicker.appendChild(bgDot);
+
+                const acDot = document.createElement('div');
+                acDot.className = `color-dot ${appData.settings.customAccent === c ? 'active' : ''}`;
+                acDot.style.backgroundColor = c;
+                acDot.onclick = () => { appData.settings.customAccent = c; save(); setupCustomColorPickers(); applyThemeSetting(); };
+                acPicker.appendChild(acDot);
+            });
+        }
+
+        function applyThemeSetting() { 
+            const t = document.getElementById('setting-theme').value; 
+            document.body.className = t; 
+            appData.settings.theme = t; 
+
+            // Apply custom variables if set, otherwise clear them
+            if (appData.settings.customBg) {
+                document.body.style.setProperty('--bg-dark', appData.settings.customBg);
+            } else {
+                document.body.style.removeProperty('--bg-dark');
+            }
+            
+            if (appData.settings.customAccent) {
+                document.body.style.setProperty('--accent', appData.settings.customAccent);
+                document.body.style.setProperty('--chart-line', appData.settings.customAccent);
+            } else {
+                document.body.style.removeProperty('--accent');
+                document.body.style.removeProperty('--chart-line');
+            }
+            
+            save(); 
+        }
+
+        function resetCustomColors() {
+            appData.settings.customBg = null;
+            appData.settings.customAccent = null;
+            save(); setupCustomColorPickers(); applyThemeSetting();
+        }
+
         function saveSettings() { appData.settings.resetTime = parseInt(document.getElementById('setting-reset-time').value); save(); }
         function clearAllData() { if(confirm('Sicher, dass du ALLES löschen willst?')) { localStorage.removeItem('coreHabitDataPro'); location.reload(); } }
         
