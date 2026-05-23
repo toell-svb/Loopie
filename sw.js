@@ -1,32 +1,22 @@
-const CACHE_NAME = 'loopie-cache-v1';
+const CACHE_NAME = 'loopie-v1';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  // Sobald du deine Icons hochgeladen hast, kannst du sie hier ergänzen, 
+  // z.B. './icon-192.png', './icon-512.png'
 ];
 
+// Install-Event: Cacht alle oben genannten Dateien
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
-        })
-      );
-    })
-  );
-});
-
+// Fetch-Event: Lädt die App aus dem Cache, wenn kein Internet da ist
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    caches.match(e.request).then((response) => response || fetch(e.request))
   );
 });
