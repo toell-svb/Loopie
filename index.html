@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Loopie</title> 
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#121212">
-
-    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
 
     <style>
         /* ================= THEME CONFIGURATION ================= */
@@ -118,6 +116,25 @@
     </style>
 </head>
 <body class="theme-dark-classic">
+
+    <!-- FOUC-Fix: Läd das Theme sofort beim Start, noch bevor die Seite aufgebaut wird -->
+    <script>
+        if(localStorage.getItem('coreHabitDataPro')) {
+            try {
+                let initialData = JSON.parse(localStorage.getItem('coreHabitDataPro'));
+                if(initialData.settings && initialData.settings.theme) {
+                    document.body.className = initialData.settings.theme;
+                }
+                if(initialData.settings && initialData.settings.customBg) {
+                    document.body.style.setProperty('--bg-dark', initialData.settings.customBg);
+                }
+                if(initialData.settings && initialData.settings.customAccent) {
+                    document.body.style.setProperty('--accent', initialData.settings.customAccent);
+                    document.body.style.setProperty('--chart-line', initialData.settings.customAccent);
+                }
+            } catch(e) {}
+        }
+    </script>
 
     <canvas id="confetti"></canvas>
     
@@ -332,12 +349,18 @@
 
         function save() { localStorage.setItem('coreHabitDataPro', JSON.stringify(appData)); }
 
+        // ZEITZONEN-FIX HIER: Nutzt jetzt die lokale Uhrzeit sauber!
         function getLogicalDateStr(offsetDays = 0) {
             const now = new Date();
             if(offsetDays !== 0) now.setDate(now.getDate() - offsetDays);
+            
             const boundary = appData.settings?.resetTime || 3;
             if (now.getHours() < boundary) now.setDate(now.getDate() - 1);
-            return now.toISOString().split('T')[0];
+            
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
         function checkDayReset() {
