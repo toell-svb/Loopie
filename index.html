@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Loopie</title> 
     <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#121212">
+
+    <link rel="manifest" href="manifest.json">
 
     <style>
         /* ================= THEME CONFIGURATION ================= */
@@ -959,5 +962,15 @@
             draw();
         }
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Loopie PWA bereit!', reg))
+        .catch(err => console.log('Fehler beim PWA-Registrieren', err));
+    });
+  }
+</script>
+
 </body>
 </html>
