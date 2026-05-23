@@ -117,7 +117,6 @@
 </head>
 <body class="theme-dark-classic">
 
-    <!-- FOUC-Fix: Läd das Theme sofort beim Start, noch bevor die Seite aufgebaut wird -->
     <script>
         if(localStorage.getItem('coreHabitDataPro')) {
             try {
@@ -256,7 +255,6 @@
                     <option value="theme-nordic-frost">Nordisches Eis</option>
                 </select>
 
-                <!-- Custom Color Feature -->
                 <h3 style="margin-top: 20px; margin-bottom:12px; font-size:14px; border-bottom: 1px solid var(--panel-brd); padding-bottom: 5px;">🎨 Eigene App-Farben (Optional)</h3>
                 <label style="font-size:11px; font-weight:bold; color:var(--text-mut); text-transform:uppercase;">Hintergrundfarbe:</label>
                 <div class="color-grid" id="bg-color-picker"></div>
@@ -349,7 +347,14 @@
 
         function save() { localStorage.setItem('coreHabitDataPro', JSON.stringify(appData)); }
 
-        // ZEITZONEN-FIX HIER: Nutzt jetzt die lokale Uhrzeit sauber!
+        // Globale Hilfsfunktion für lokales Datums-String-Format (YYYY-MM-DD) ohne UTC-Verschiebung
+        function formatDateLocal(dateObj) {
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function getLogicalDateStr(offsetDays = 0) {
             const now = new Date();
             if(offsetDays !== 0) now.setDate(now.getDate() - offsetDays);
@@ -357,10 +362,7 @@
             const boundary = appData.settings?.resetTime || 3;
             if (now.getHours() < boundary) now.setDate(now.getDate() - 1);
             
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            return formatDateLocal(now);
         }
 
         function checkDayReset() {
@@ -457,7 +459,6 @@
             return !!task?.done;
         }
 
-        // Helper für den Globalen Kalender
         function getDailyGlobalStat(dStr) {
             let total = 0;
             let done = 0;
@@ -468,7 +469,7 @@
                     if (stat === true) done++;
                 }
             });
-            if (total === 0) return null; // An dem Tag gab es keine aktiven Habits
+            if (total === 0) return null; 
             return { total, done, pct: Math.round((done / total) * 100) };
         }
 
@@ -541,14 +542,14 @@
             let count = 0;
             let checkDate = new Date();
             if(checkDate.getHours() < (appData.settings.resetTime||3)) checkDate.setDate(checkDate.getDate() - 1);
-            let todayStr = checkDate.toISOString().split('T')[0];
+            let todayStr = formatDateLocal(checkDate);
 
             let statToday = getHabitStatus(h, todayStr);
             if (statToday === true) count++;
             
             checkDate.setDate(checkDate.getDate() - 1);
             while(true) {
-                let dStr = checkDate.toISOString().split('T')[0];
+                let dStr = formatDateLocal(checkDate);
                 let stat = getHabitStatus(h, dStr);
                 if(stat === true) count++;
                 else if (stat === false || stat === null) break;
@@ -568,7 +569,7 @@
             if(checkDate.getHours() < (appData.settings.resetTime||3)) checkDate.setDate(checkDate.getDate() - 1);
             
             while(true) {
-                let dStr = checkDate.toISOString().split('T')[0];
+                let dStr = formatDateLocal(checkDate);
                 let allDone = appData.habits.every(h => getHabitStatus(h, dStr));
                 if(allDone && appData.habits.length > 0) currentCount++;
                 else if (dStr !== todayStr) break;
@@ -698,7 +699,6 @@
             if(!sel) return;
             const currentVal = sel.value;
             
-            // Global-Option als erstes hinzufügen
             let options = `<option value="GLOBAL">🌐 Globaler Fortschritt (Alle)</option>`;
             options += appData.habits.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
             
@@ -707,7 +707,7 @@
             if (currentVal && document.querySelector(`#cal-habit-select option[value="${currentVal}"]`)) {
                 sel.value = currentVal;
             } else {
-                sel.value = 'GLOBAL'; // Standardmäßig Global auswählen
+                sel.value = 'GLOBAL'; 
             }
         }
         function resetCalOffset() { calOffset = 0; }
@@ -745,7 +745,7 @@
                 const tNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
                 for(let i=0; i<7; i++) {
                     let d = new Date(startD); d.setDate(startD.getDate() + i);
-                    let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    let dStr = formatDateLocal(d);
                     
                     let bg = 'var(--color-empty)'; let txt = ''; let tColor = 'inherit';
 
@@ -753,7 +753,7 @@
                         let gStat = getDailyGlobalStat(dStr);
                         if (gStat) {
                             let p = gStat.pct;
-                            let hue = p * 1.2; // 0% = rot (0), 50% = gelb (60), 100% = grün (120)
+                            let hue = p * 1.2; 
                             let hColor = `hsl(${hue}, 80%, 45%)`;
                             bg = `linear-gradient(to top, ${hColor} 0%, ${hColor} ${p}%, var(--color-empty) ${p}%, var(--color-empty) 100%)`;
                             
@@ -814,7 +814,7 @@
                 let days = now.getFullYear() % 4 === 0 ? 366 : 365;
                 for(let t=0; t<days; t++) {
                     let d = new Date(now.getFullYear(), 0, 1 + t);
-                    let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    let dStr = formatDateLocal(d);
                     
                     let bg = 'var(--color-empty)'; let opacity = 1;
 
@@ -845,7 +845,7 @@
             // Render Milestones
             let curStrk = 0; let checkD = new Date();
             while(true) {
-                let dStr = `${checkD.getFullYear()}-${String(checkD.getMonth()+1).padStart(2,'0')}-${String(checkD.getDate()).padStart(2,'0')}`;
+                let dStr = formatDateLocal(checkD);
                 
                 if (selId === 'GLOBAL') {
                     let gStat = getDailyGlobalStat(dStr);
@@ -944,7 +944,6 @@
             document.body.className = t; 
             appData.settings.theme = t; 
 
-            // Apply custom variables if set, otherwise clear them
             if (appData.settings.customBg) {
                 document.body.style.setProperty('--bg-dark', appData.settings.customBg);
             } else {
@@ -986,14 +985,13 @@
         }
     </script>
     <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Loopie PWA bereit!', reg))
-        .catch(err => console.log('Fehler beim PWA-Registrieren', err));
-    });
-  }
-</script>
-
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Loopie PWA bereit!', reg))
+            .catch(err => console.log('Fehler beim PWA-Registrieren', err));
+        });
+      }
+    </script>
 </body>
 </html>
