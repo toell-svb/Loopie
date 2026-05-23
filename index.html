@@ -993,5 +993,20 @@
         });
       }
     </script>
+    <script>
+  // Prüft, ob der Browser Service Worker überhaupt unterstützt
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => {
+          console.log('Loopie Service Worker erfolgreich registriert!', reg.scope);
+        })
+        .catch((err) => {
+          console.error('Service Worker Registrierung fehlgeschlagen:', err);
+        });
+    });
+  }
+</script>
+
 </body>
 </html>
