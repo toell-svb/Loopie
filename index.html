@@ -81,11 +81,11 @@
 
         .week-grid { display: flex; justify-content: space-between; text-align: center; margin-top: 10px; }
         .grid-day-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .grid-square { width: 35px; height: 35px; background-color: var(--color-empty); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+        .grid-square { width: 35px; height: 35px; background-color: var(--color-empty); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; overflow: hidden; }
         
         .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; margin-top: 10px;}
         .month-header { font-size: 11px; font-weight: bold; color: var(--text-mut); padding-bottom: 5px; text-transform: uppercase;}
-        .month-day { font-size: 12px; padding: 8px 0; background-color: var(--color-empty); border-radius: 6px; font-weight: 600; position: relative; }
+        .month-day { font-size: 12px; padding: 8px 0; background-color: var(--color-empty); border-radius: 6px; font-weight: 600; position: relative; overflow: hidden;}
         
         .year-matrix { display: grid; grid-template-columns: repeat(20, 1fr); gap: 3px; margin-top: 10px;}
         .year-square { aspect-ratio: 1; background-color: var(--color-empty); border-radius: 2px; }
@@ -149,7 +149,7 @@
             <header><h1>Historie & Erfolge</h1></header>
             
             <div class="card">
-                <label style="font-size:11px; color:var(--text-mut); text-transform:uppercase; font-weight:bold;">Habit auswählen:</label>
+                <label style="font-size:11px; color:var(--text-mut); text-transform:uppercase; font-weight:bold;">Ansicht wählen:</label>
                 <select id="cal-habit-select" onchange="resetCalOffset(); renderCalendarTab();" style="margin-top:6px; margin-bottom:0;"></select>
             </div>
 
@@ -399,7 +399,6 @@
             let firstDate = null;
             for (let dateStr in appData.history) {
                 let task = appData.history[dateStr][habitId];
-                // Wir betrachten eine Task als "genutzt", sobald sie einmal positiv beeinflusst wurde.
                 if (task && (task.done === true || task.val > 0 || task.joker === true)) {
                     if (!firstDate || dateStr < firstDate) firstDate = dateStr;
                 }
@@ -410,10 +409,9 @@
         function getHabitStatus(h, dateStr) {
             if (dateStr > getLogicalDateStr()) return null; 
             
-            // Check für Kalender-Start (Nicht anzeigen bevor das erste Mal genutzt)
             const firstUsed = getFirstUsedDate(h.id);
             if (firstUsed && dateStr < firstUsed) return null; 
-            if (!firstUsed && dateStr !== getLogicalDateStr()) return null; // Falls nie genutzt, bleibt Historie leer
+            if (!firstUsed && dateStr !== getLogicalDateStr()) return null; 
             
             const dayRecord = appData.history[dateStr];
             const task = dayRecord ? dayRecord[h.id] : null;
@@ -429,6 +427,21 @@
             
             if (h.mode === 'counter') return !!(task?.done || (task?.val >= h.target));
             return !!task?.done;
+        }
+
+        // Helper für den Globalen Kalender
+        function getDailyGlobalStat(dStr) {
+            let total = 0;
+            let done = 0;
+            appData.habits.forEach(h => {
+                let stat = getHabitStatus(h, dStr);
+                if (stat !== null) {
+                    total++;
+                    if (stat === true) done++;
+                }
+            });
+            if (total === 0) return null; // An dem Tag gab es keine aktiven Habits
+            return { total, done, pct: Math.round((done / total) * 100) };
         }
 
         function toggleHabit(id) {
@@ -462,19 +475,18 @@
                 if(Math.random() < 0.25 && appData.emotes.length < 20) {
                     const e = emotePool[Math.floor(Math.random() * emotePool.length)];
                     appData.emotes.push(e);
-                    task.earnedEmote = e; // Tag the earned emote to this task today
+                    task.earnedEmote = e; 
                     showEmoteModal(e);
                 }
             } else if (wasCompleted && !isCompletedNow && h.mode !== 'negative') {
                 appData.xp = Math.max(0, appData.xp - 15);
-                // Anti-Cheat: Remove the exactly earned emote if unchecked
                 if (task.earnedEmote) {
                     const emoteIdx = appData.emotes.lastIndexOf(task.earnedEmote);
                     if(emoteIdx > -1) {
                         appData.emotes.splice(emoteIdx, 1);
-                        selectedFusionEmotes = []; // Reset selection to prevent UI bugs
+                        selectedFusionEmotes = []; 
                     }
-                    delete task.earnedEmote; // Remove tag
+                    delete task.earnedEmote;
                 }
             }
 
@@ -656,8 +668,19 @@
         function updateCalDropdown() {
             const sel = document.getElementById('cal-habit-select');
             if(!sel) return;
-            sel.innerHTML = appData.habits.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
-            if(!appData.habits.length) sel.innerHTML = `<option>Keine Habits</option>`;
+            const currentVal = sel.value;
+            
+            // Global-Option als erstes hinzufügen
+            let options = `<option value="GLOBAL">🌐 Globaler Fortschritt (Alle)</option>`;
+            options += appData.habits.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
+            
+            sel.innerHTML = options;
+            
+            if (currentVal && document.querySelector(`#cal-habit-select option[value="${currentVal}"]`)) {
+                sel.value = currentVal;
+            } else {
+                sel.value = 'GLOBAL'; // Standardmäßig Global auswählen
+            }
         }
         function resetCalOffset() { calOffset = 0; }
         function changeCalOffset(delta) { calOffset = Math.max(0, calOffset + delta); renderCalendarTab(); }
@@ -673,11 +696,11 @@
 
         function renderCalendarTab() {
             const selId = document.getElementById('cal-habit-select').value;
-            const habit = appData.habits.find(h => h.id === selId);
+            const habit = selId !== 'GLOBAL' ? appData.habits.find(h => h.id === selId) : null;
             const zone = document.getElementById('calendar-render-zone');
             
             if(!zone) return;
-            if(!habit) { zone.innerHTML = '<p style="color:var(--text-mut); text-align:center; padding:20px;">Kein Habit ausgewählt oder angelegt.</p>'; return; }
+            if(!habit && selId !== 'GLOBAL') { zone.innerHTML = '<p style="color:var(--text-mut); text-align:center; padding:20px;">Kein Habit angelegt.</p>'; return; }
 
             const now = new Date();
             let renderedDays = 0; let successDays = 0;
@@ -695,13 +718,28 @@
                 for(let i=0; i<7; i++) {
                     let d = new Date(startD); d.setDate(startD.getDate() + i);
                     let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                    let stat = getHabitStatus(habit, dStr);
                     
-                    let bg = 'var(--color-empty)'; let txt = '';
-                    if(stat === true) { bg = 'rgba(16, 185, 129, 0.2)'; txt = '✓'; successDays++; renderedDays++;}
-                    else if(stat === false) { bg = 'rgba(239, 68, 68, 0.2)'; txt = '✗'; renderedDays++;}
+                    let bg = 'var(--color-empty)'; let txt = ''; let tColor = 'inherit';
 
-                    html += `<div class="grid-day-col"><div style="font-size:11px; color:var(--text-mut);">${tNames[i]}</div><div class="grid-square" style="background-color:${bg}; color:${stat? '#10b981':'#ef4444'}">${txt}</div></div>`;
+                    if (selId === 'GLOBAL') {
+                        let gStat = getDailyGlobalStat(dStr);
+                        if (gStat) {
+                            let p = gStat.pct;
+                            let hue = p * 1.2; // 0% = rot (0), 50% = gelb (60), 100% = grün (120)
+                            let hColor = `hsl(${hue}, 80%, 45%)`;
+                            bg = `linear-gradient(to top, ${hColor} 0%, ${hColor} ${p}%, var(--color-empty) ${p}%, var(--color-empty) 100%)`;
+                            
+                            if (p === 100) { txt = '✓'; successDays++; tColor = '#fff'; }
+                            else { txt = `${p}%`; tColor = '#fff'; }
+                            renderedDays++;
+                        }
+                    } else {
+                        let stat = getHabitStatus(habit, dStr);
+                        if(stat === true) { bg = 'rgba(16, 185, 129, 0.2)'; txt = '✓'; successDays++; renderedDays++; tColor = '#10b981';}
+                        else if(stat === false) { bg = 'rgba(239, 68, 68, 0.2)'; txt = '✗'; renderedDays++; tColor = '#ef4444';}
+                    }
+
+                    html += `<div class="grid-day-col"><div style="font-size:11px; color:var(--text-mut);">${tNames[i]}</div><div class="grid-square" style="background:${bg}; color:${tColor}; font-size:${(selId==='GLOBAL' && txt!=='✓' && txt!=='') ? '10px' : '12px'}">${txt}</div></div>`;
                 }
                 zone.innerHTML = html + `</div>`;
             } 
@@ -717,11 +755,27 @@
 
                 for(let i = 1; i <= dim; i++) {
                     let dStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                    const stat = getHabitStatus(habit, dStr);
-                    let bg = 'var(--color-empty)';
-                    if(stat === true) { bg = '#10b981'; successDays++; renderedDays++;}
-                    else if(stat === false) { bg = '#ef4444'; renderedDays++;}
-                    html += `<div class="month-day" style="background-color:${bg}; opacity:${stat===null?0.3:0.9}; color:${stat !== null?'#fff':'inherit'}">${i}</div>`;
+                    let bg = 'var(--color-empty)'; let opacity = 0.9; let txtColor = 'inherit';
+
+                    if (selId === 'GLOBAL') {
+                        let gStat = getDailyGlobalStat(dStr);
+                        if (gStat) {
+                            let p = gStat.pct;
+                            let hue = p * 1.2;
+                            let hColor = `hsl(${hue}, 80%, 45%)`;
+                            bg = `linear-gradient(to top, ${hColor} 0%, ${hColor} ${p}%, var(--color-empty) ${p}%, var(--color-empty) 100%)`;
+                            if(p === 100) successDays++;
+                            renderedDays++;
+                            txtColor = '#fff';
+                        } else { opacity = 0.3; }
+                    } else {
+                        const stat = getHabitStatus(habit, dStr);
+                        if(stat === true) { bg = '#10b981'; successDays++; renderedDays++; txtColor = '#fff';}
+                        else if(stat === false) { bg = '#ef4444'; renderedDays++; txtColor = '#fff';}
+                        if(stat === null) opacity = 0.3;
+                    }
+
+                    html += `<div class="month-day" style="background:${bg}; opacity:${opacity}; color:${txtColor}; border: ${selId==='GLOBAL' && opacity !== 0.3 ? '1px solid rgba(0,0,0,0.1)' : 'none'}">${i}</div>`;
                 }
                 zone.innerHTML = html + `</div>`;
             } 
@@ -733,29 +787,57 @@
                 for(let t=0; t<days; t++) {
                     let d = new Date(now.getFullYear(), 0, 1 + t);
                     let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                    const stat = getHabitStatus(habit, dStr);
-                    let bg = 'var(--color-empty)';
-                    if(stat === true) { bg = '#10b981'; successDays++; renderedDays++;}
-                    else if(stat === false) { bg = '#ef4444'; renderedDays++;}
-                    html += `<div class="year-square" style="background-color:${bg}; opacity:${stat===null?0.2:1};"></div>`;
+                    
+                    let bg = 'var(--color-empty)'; let opacity = 1;
+
+                    if (selId === 'GLOBAL') {
+                        let gStat = getDailyGlobalStat(dStr);
+                        if (gStat) {
+                            let p = gStat.pct;
+                            let hue = p * 1.2;
+                            let hColor = `hsl(${hue}, 80%, 45%)`;
+                            bg = `linear-gradient(to top, ${hColor} 0%, ${hColor} ${p}%, var(--color-empty) ${p}%, var(--color-empty) 100%)`;
+                            if(p === 100) successDays++;
+                            renderedDays++;
+                        } else { opacity = 0.2; }
+                    } else {
+                        const stat = getHabitStatus(habit, dStr);
+                        if(stat === true) { bg = '#10b981'; successDays++; renderedDays++;}
+                        else if(stat === false) { bg = '#ef4444'; renderedDays++;}
+                        if(stat === null) opacity = 0.2;
+                    }
+                    html += `<div class="year-square" style="background:${bg}; opacity:${opacity};"></div>`;
                 }
                 zone.innerHTML = html + `</div>`;
             }
 
             let pct = renderedDays > 0 ? Math.round((successDays/renderedDays)*100) : 0;
-            document.getElementById('cal-percent').innerText = `${pct}% Erfolg`;
+            document.getElementById('cal-percent').innerText = `${pct}% ${selId === 'GLOBAL' ? 'Perfekte Tage' : 'Erfolg'}`;
 
             // Render Milestones
             let curStrk = 0; let checkD = new Date();
             while(true) {
                 let dStr = `${checkD.getFullYear()}-${String(checkD.getMonth()+1).padStart(2,'0')}-${String(checkD.getDate()).padStart(2,'0')}`;
-                let st = getHabitStatus(habit, dStr);
-                if(st === true) curStrk++; else if(st === false) break;
                 
-                const fUsed = getFirstUsedDate(habit.id);
-                if(fUsed && dStr <= fUsed) break;
-                if(!fUsed) break;
-
+                if (selId === 'GLOBAL') {
+                    let gStat = getDailyGlobalStat(dStr);
+                    if(gStat && gStat.pct === 100) curStrk++;
+                    else if(gStat && gStat.pct < 100) break;
+                    
+                    let earliest = null;
+                    appData.habits.forEach(h => {
+                        let f = getFirstUsedDate(h.id);
+                        if(f && (!earliest || f < earliest)) earliest = f;
+                    });
+                    if(!earliest || dStr <= earliest) break;
+                } else {
+                    let st = getHabitStatus(habit, dStr);
+                    if(st === true) curStrk++; else if(st === false) break;
+                    
+                    const fUsed = getFirstUsedDate(habit.id);
+                    if(fUsed && dStr <= fUsed) break;
+                    if(!fUsed) break;
+                }
                 checkD.setDate(checkD.getDate() - 1);
             }
 
