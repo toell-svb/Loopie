@@ -218,6 +218,22 @@
                 </div>
                 <div class="weight-chart-wrapper"><svg id="weight-line-svg" viewBox="0 0 400 180" style="width: 100%; height: auto; display: block; overflow: visible;"></svg></div>
             </div>
+
+            <!-- NEU: GEWICHTS ANALYSE METRIKEN DIREKT UNTER DEM INPUT/CHART -->
+            <h2>📊 Gewichts-Analyse</h2>
+            <div class="stats-grid" id="weight-analysis-grid"></div>
+
+            <!-- NEU: AKTUELLE HISTORIE (LETZTE 30) -->
+            <h2>📋 Aktuelle Einträge (Max. 30)</h2>
+            <div class="card" id="weight-recent-list" style="max-height: 250px; overflow-y: auto; padding: 4px 12px;"></div>
+
+            <!-- NEU: HISTORIE ARCHIV MIT MONATSAUSWAHL FÜR ÄLTERE DATEN -->
+            <h2>🗄️ Historie Archiv</h2>
+            <div class="card">
+                <label style="font-size:11px; color:var(--text-mut); text-transform:uppercase; font-weight:bold; display:block; margin-bottom:6px;">Monat wählen:</label>
+                <select id="weight-history-month-select" onchange="renderWeightHistoryArchiv()" style="margin-bottom:12px;"></select>
+                <div id="weight-archive-list" style="max-height: 200px; overflow-y: auto; padding: 4px 0;"></div>
+            </div>
         </div>
 
         <div id="view-settings" class="view">
@@ -246,6 +262,12 @@
                 <button class="btn-prime" onclick="createHabit()">Habit hinzufügen</button>
             </div>
 
+            <!-- ERWEITERT: HABITS VERWALTEN & INLINE UMBENENNEN -->
+            <div class="card">
+                <h3 style="font-size: 14px; margin-bottom: 10px;">⚙️ Habits bearbeiten & umbenennen</h3>
+                <div id="manage-list-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+
             <div class="card">
                 <h3 style="margin-bottom:12px; font-size:15px;">⚙️ App Optionen</h3>
                 <label style="font-size:11px; font-weight:bold; color:var(--text-mut); text-transform:uppercase;">Theme:</label>
@@ -271,7 +293,6 @@
                 </select>
             </div>
             
-            <div class="card"><h3 style="font-size: 14px; margin-bottom: 10px;">🗑 Habit löschen</h3><div id="delete-list-container" style="display:flex; flex-direction:column; gap:8px;"></div></div>
             <button class="btn-prime" style="background:transparent; border: 1px solid #ef4444; color:#ef4444;" onclick="clearAllData()">Kompletten Werksreset durchführen</button>
         </div>
     </div>
@@ -325,6 +346,7 @@
                 appData = { ...appData, ...loaded };
                 if(!appData.emotes) appData.emotes = [];
                 if(!appData.jokers) appData.jokers = 0;
+                if(!appData.weight) appData.weight = [];
             }
             
             document.getElementById('today-date').innerText = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'short' });
@@ -347,7 +369,6 @@
 
         function save() { localStorage.setItem('coreHabitDataPro', JSON.stringify(appData)); }
 
-        // Globale Hilfsfunktion für lokales Datums-String-Format (YYYY-MM-DD) ohne UTC-Verschiebung
         function formatDateLocal(dateObj) {
             const year = dateObj.getFullYear();
             const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -379,7 +400,7 @@
             renderAll();
         }
 
-        // ================= HABIT CREATION & LOGIC =================
+        // ================= HABIT CREATION, RENAMING & LOGIC =================
         function setupColorPicker() {
             const picker = document.getElementById('color-picker-grid');
             picker.innerHTML = '';
@@ -423,6 +444,21 @@
             document.getElementById('habit-name').value = '';
             document.getElementById('habit-target').value = '1';
             switchView('today');
+        }
+
+        // NEUE FUNKTION: HABIT UMBENENNEN OHNE LÖSCHEN
+        function renameHabit(id) {
+            const input = document.getElementById(`rename-input-${id}`);
+            if(!input) return;
+            const newName = input.value.trim();
+            if(!newName) return alert("Bitte gib einen Namen ein!");
+            
+            const h = appData.habits.find(x => x.id === id);
+            if(h) {
+                h.name = newName;
+                save(); renderAll(); updateCalDropdown();
+                alert("Name erfolgreich geändert!");
+            }
         }
 
         function getFirstUsedDate(habitId) {
@@ -484,11 +520,14 @@
             const wasCompleted = getHabitStatus(h, todayStr);
 
             if(h.mode === 'counter') {
+                // ANGEPASST: DYNAMISCHE STRATEGISCHE SCHRITTE JE NACH SKALA (und so weiter)
                 let step = 1;
                 if (h.target <= 10) step = 1;
                 else if (h.target <= 100) step = 10;
                 else if (h.target <= 1000) step = 100;
-                else step = 1000;
+                else if (h.target <= 10000) step = 1000;
+                else if (h.target <= 100000) step = 10000;
+                else step = Math.pow(10, Math.floor(Math.log10(h.target)) - 1);
 
                 task.val = (task.val || 0) + step;
                 if(task.val >= h.target) task.done = true;
@@ -587,15 +626,16 @@
             }
         }
 
-        // ================= MAIN RENDER =================
+        // ================= MAIN RENDER ENGINE =================
         function renderAll() {
             const todayStr = getLogicalDateStr();
             const pList = document.getElementById('list-pending');
             const cList = document.getElementById('list-completed');
-            const dList = document.getElementById('delete-list-container');
+            const mList = document.getElementById('manage-list-container');
+            
             if(pList) pList.innerHTML = ''; 
             if(cList) cList.innerHTML = ''; 
-            if(dList) dList.innerHTML = '';
+            if(mList) mList.innerHTML = '';
 
             const lvlNames = ["Ranger", "Routine-Hunter", "Pathfinder", "Overlord", "Grandmaster"];
             document.getElementById('txt-level').innerText = `Lvl ${appData.level} ${lvlNames[Math.min(appData.level-1, 4)]}`;
@@ -641,16 +681,33 @@
                 `;
 
                 if (isCompleted) { if(cList) cList.appendChild(item); } else { if(pList) pList.appendChild(item); }
-
-                if(dList) dList.innerHTML += `<div style="display:flex; justify-content:space-between; background:var(--bg-dark); padding:10px; border-radius:8px; align-items:center;"><span style="font-size:14px; font-weight:bold;">${h.name}</span><button onclick="deleteHabit('${h.id}')" style="background:transparent; border:none; color:#ef4444; cursor:pointer;">🗑 Löschen</button></div>`;
             });
+
+            // RENDERING FÜR MANAGEMENT / UMBENENNEN IM SETUP
+            if(mList) {
+                appData.habits.forEach(h => {
+                    const mItem = document.createElement('div');
+                    mItem.style.cssText = "display:flex; align-items:center; justify-content:space-between; background:var(--bg-dark); padding:10px; border-radius:8px; gap:8px; border:1px solid var(--panel-brd);";
+                    mItem.innerHTML = `
+                        <input type="text" id="rename-input-${h.id}" value="${h.name}" style="margin:0; padding:6px 10px; font-size:13px; flex:1;">
+                        <button onclick="renameHabit('${h.id}')" style="width:auto; margin:0; padding:6px 12px; background:var(--accent); border:none; color:white; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">Speichern</button>
+                        <button onclick="deleteHabit('${h.id}')" style="width:auto; margin:0; padding:6px 12px; background:transparent; border:1px solid #ef4444; color:#ef4444; border-radius:6px; font-size:12px; cursor:pointer;">🗑</button>
+                    `;
+                    mList.appendChild(mItem);
+                });
+                if(appData.habits.length === 0) mList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center;">Keine Gewohnheiten angelegt.</p>';
+            }
 
             if(pList && pList.innerHTML === '') pList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">🎉 Alles geschafft!</p>';
             if(cList && cList.innerHTML === '') cList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">Noch nichts beendet.</p>';
 
             renderInventar();
             if(document.getElementById('view-calendar').classList.contains('active')) renderCalendarTab();
+            
+            // RENDERING GEWICHTS MODULE
             renderWeightLineChart();
+            renderWeightAnalysisModule();
+            renderWeightHistoryLists();
         }
 
         // ================= INVENTAR & FUSION =================
@@ -693,7 +750,7 @@
             alert("✨ Fusion erfolgreich! Du hast 1 neuen Joker geschmiedet.");
         }
 
-        // ================= CALENDAR ENGINE =================
+        // ================= ADVANCED CALENDAR ENGINE =================
         function updateCalDropdown() {
             const sel = document.getElementById('cal-habit-select');
             if(!sel) return;
@@ -762,9 +819,17 @@
                             renderedDays++;
                         }
                     } else {
-                        let stat = getHabitStatus(habit, dStr);
-                        if(stat === true) { bg = 'rgba(16, 185, 129, 0.2)'; txt = '✓'; successDays++; renderedDays++; tColor = '#10b981';}
-                        else if(stat === false) { bg = 'rgba(239, 68, 68, 0.2)'; txt = '✗'; renderedDays++; tColor = '#ef4444';}
+                        // ANGEPASST: JOKER ANZEIGE IN GELB MIT ICON FÜR HABIT-SPEZIFISCHE KALENDER
+                        let dayRecord = appData.history[dStr];
+                        let task = dayRecord ? dayRecord[habit.id] : null;
+                        
+                        if (task?.joker) {
+                            bg = 'rgba(245, 158, 11, 0.25)'; txt = '🛡️'; successDays++; renderedDays++; tColor = '#f59e0b';
+                        } else {
+                            let stat = getHabitStatus(habit, dStr);
+                            if(stat === true) { bg = 'rgba(16, 185, 129, 0.2)'; txt = '✓'; successDays++; renderedDays++; tColor = '#10b981';}
+                            else if(stat === false) { bg = 'rgba(239, 68, 68, 0.2)'; txt = '✗'; renderedDays++; tColor = '#ef4444';}
+                        }
                     }
 
                     html += `<div class="grid-day-col"><div style="font-size:11px; color:var(--text-mut);">${tNames[i]}</div><div class="grid-square" style="background:${bg}; color:${tColor}; font-size:${(selId==='GLOBAL' && txt!=='✓' && txt!=='') ? '10px' : '12px'}">${txt}</div></div>`;
@@ -783,7 +848,7 @@
 
                 for(let i = 1; i <= dim; i++) {
                     let dStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                    let bg = 'var(--color-empty)'; let opacity = 0.9; let txtColor = 'inherit';
+                    let bg = 'var(--color-empty)'; let opacity = 0.9; let txtColor = 'inherit'; let innerTxt = i;
 
                     if (selId === 'GLOBAL') {
                         let gStat = getDailyGlobalStat(dStr);
@@ -797,13 +862,21 @@
                             txtColor = '#fff';
                         } else { opacity = 0.3; }
                     } else {
-                        const stat = getHabitStatus(habit, dStr);
-                        if(stat === true) { bg = '#10b981'; successDays++; renderedDays++; txtColor = '#fff';}
-                        else if(stat === false) { bg = '#ef4444'; renderedDays++; txtColor = '#fff';}
-                        if(stat === null) opacity = 0.3;
+                        // ANGEPASST: JOKER HIGHLIGHT IM MONATSKALENDER
+                        let dayRecord = appData.history[dStr];
+                        let task = dayRecord ? dayRecord[habit.id] : null;
+
+                        if (task?.joker) {
+                            bg = '#f59e0b'; innerTxt = '🛡️'; successDays++; renderedDays++; txtColor = '#000';
+                        } else {
+                            const stat = getHabitStatus(habit, dStr);
+                            if(stat === true) { bg = '#10b981'; successDays++; renderedDays++; txtColor = '#fff';}
+                            else if(stat === false) { bg = '#ef4444'; renderedDays++; txtColor = '#fff';}
+                            if(stat === null) opacity = 0.3;
+                        }
                     }
 
-                    html += `<div class="month-day" style="background:${bg}; opacity:${opacity}; color:${txtColor}; border: ${selId==='GLOBAL' && opacity !== 0.3 ? '1px solid rgba(0,0,0,0.1)' : 'none'}">${i}</div>`;
+                    html += `<div class="month-day" style="background:${bg}; opacity:${opacity}; color:${txtColor}; border: ${selId==='GLOBAL' && opacity !== 0.3 ? '1px solid rgba(0,0,0,0.1)' : 'none'}">${innerTxt}</div>`;
                 }
                 zone.innerHTML = html + `</div>`;
             } 
@@ -829,10 +902,18 @@
                             renderedDays++;
                         } else { opacity = 0.2; }
                     } else {
-                        const stat = getHabitStatus(habit, dStr);
-                        if(stat === true) { bg = '#10b981'; successDays++; renderedDays++;}
-                        else if(stat === false) { bg = '#ef4444'; renderedDays++;}
-                        if(stat === null) opacity = 0.2;
+                        // ANGEPASST: JOKER ERKENNUNG IM JAHRESMATRIX (GELBER PUNKT)
+                        let dayRecord = appData.history[dStr];
+                        let task = dayRecord ? dayRecord[habit.id] : null;
+
+                        if(task?.joker) {
+                            bg = '#f59e0b'; successDays++; renderedDays++;
+                        } else {
+                            const stat = getHabitStatus(habit, dStr);
+                            if(stat === true) { bg = '#10b981'; successDays++; renderedDays++;}
+                            else if(stat === false) { bg = '#ef4444'; renderedDays++;}
+                            if(stat === null) opacity = 0.2;
+                        }
                     }
                     html += `<div class="year-square" style="background:${bg}; opacity:${opacity};"></div>`;
                 }
@@ -878,19 +959,149 @@
             }
         }
 
-        // ================= WEIGHT CHART =================
+        // ================= WEIGHT CORE ENGINE & HISTORY SYSTEM =================
         function addWeightLog() {
             const val = parseFloat(document.getElementById('weight-input').value);
             if(!val) return;
-            appData.weight.push({ date: new Date().toLocaleDateString('de-DE', {day: '2-digit', month: 'short'}), value: val });
-            save(); document.getElementById('weight-input').value = ''; renderAll();
+            
+            // Vollständige zeitbasierte Keys & Labels generieren
+            const now = new Date();
+            const dateKey = formatDateLocal(now); // YYYY-MM-DD Format für lückenlose Auswertung
+            const label = now.toLocaleDateString('de-DE', {day: '2-digit', month: 'short'});
+            
+            appData.weight.push({ 
+                dateKey: dateKey, 
+                date: label, 
+                value: val 
+            });
+            
+            save(); 
+            document.getElementById('weight-input').value = ''; 
+            renderAll();
+        }
+
+        // NEU: ANALYSE-WERTEMODUL (REINE KENNZAHLEN, KEINE SÄTZE)
+        function renderWeightAnalysisModule() {
+            const grid = document.getElementById('weight-analysis-grid');
+            if(!grid) return;
+            
+            if(!appData.weight || appData.weight.length === 0) {
+                grid.innerHTML = '<div class="card" style="grid-column: span 2; text-align:center; color:var(--text-mut); font-size:13px; width:100%;">Keine Gewichtsdaten für Metriken vorhanden</div>';
+                return;
+            }
+
+            const values = appData.weight.map(w => w.value);
+            const start = values[0];
+            const current = values[values.length - 1];
+            const diff = current - start;
+            
+            const sum = values.reduce((a, b) => a + b, 0);
+            const avg = sum / values.length;
+            
+            const max = Math.max(...values);
+            const min = Math.min(...values);
+
+            grid.innerHTML = `
+                <div class="stat-mini"><span>Aktuell</span><strong>${current.toFixed(1)} kg</strong></div>
+                <div class="stat-mini"><span>Durchschnitt</span><strong>${avg.toFixed(1)} kg</strong></div>
+                <div class="stat-mini"><span>Trend Gesamt</span><strong style="color: ${diff > 0 ? '#ef4444' : diff < 0 ? '#10b981' : 'inherit'}">${diff >= 0 ? '+' : ''}${diff.toFixed(1)} kg</strong></div>
+                <div class="stat-mini"><span>Startwert</span><strong>${start.toFixed(1)} kg</strong></div>
+                <div class="stat-mini"><span>Höchstwert</span><strong>${max.toFixed(1)} kg</strong></div>
+                <div class="stat-mini"><span>Tiefstwert</span><strong>${min.toFixed(1)} kg</strong></div>
+            `;
+        }
+
+        // NEU: HISTORIE SPRACH- & MONATSSPLIT (30 NEUESTE VS RESTE IM ARCHIV)
+        function renderWeightHistoryLists() {
+            const recentList = document.getElementById('weight-recent-list');
+            const select = document.getElementById('weight-history-month-select');
+            
+            if(!recentList) return;
+
+            const allLogs = [...appData.weight];
+            // Die letzten 30 eingetragenen Werte (neueste zuerst)
+            const recentLogs = allLogs.slice(-30).reverse();
+            // Alle restlichen Werte wandern in die Archiv-Masse
+            const archiveLogs = allLogs.slice(0, Math.max(0, allLogs.length - 30));
+
+            // Aktuelle 30 rendern
+            if(recentLogs.length === 0) {
+                recentList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">Noch keine Gewichtsdaten erfasst.</p>';
+            } else {
+                recentList.innerHTML = recentLogs.map(l => `
+                    <div style="display:flex; justify-content:between; padding:8px 0; border-bottom:1px solid var(--panel-brd); font-size:13px;">
+                        <span style="color:var(--text-mut);">${l.date}</span>
+                        <strong style="color:var(--text-main); margin-left: auto;">${l.value.toFixed(1)} kg</strong>
+                    </div>
+                `).join('');
+            }
+
+            // Dropdown für Archiv befüllen
+            const prevSelected = select ? select.value : '';
+            if(select) {
+                const monthsMap = {};
+                archiveLogs.forEach(l => {
+                    // Falls legacy Daten kein dateKey besitzen, Fallback ermitteln
+                    let key = l.dateKey ? l.dateKey.substring(0, 7) : 'legacy';
+                    monthsMap[key] = true;
+                });
+                const uniqueMonths = Object.keys(monthsMap).sort().reverse();
+
+                if(uniqueMonths.length === 0) {
+                    select.innerHTML = '<option value="">Keine Archivdaten vorhanden</option>';
+                } else {
+                    select.innerHTML = uniqueMonths.map(m => {
+                        if(m === 'legacy') return '<option value="legacy">Ältere Einträge</option>';
+                        const [year, month] = m.split('-');
+                        const dObj = new Date(parseInt(year), parseInt(month) - 1, 1);
+                        return `<option value="${m}">${dObj.toLocaleDateString('de-DE', {month:'long', year:'numeric'})}</option>`;
+                    }).join('');
+                    
+                    if(prevSelected && select.querySelector(`option[value="${prevSelected}"]`)) {
+                        select.value = prevSelected;
+                    }
+                }
+            }
+
+            renderWeightHistoryArchiv();
+        }
+
+        function renderWeightHistoryArchiv() {
+            const select = document.getElementById('weight-history-month-select');
+            const archiveList = document.getElementById('weight-archive-list');
+            if(!archiveList || !select) return;
+
+            const allLogs = [...appData.weight];
+            const archiveLogs = allLogs.slice(0, Math.max(0, allLogs.length - 30));
+            const selectedMonth = select.value;
+
+            if(!selectedMonth || archiveLogs.length === 0) {
+                archiveList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">Archiv leer.</p>';
+                return;
+            }
+
+            const filtered = archiveLogs.filter(l => {
+                let mKey = l.dateKey ? l.dateKey.substring(0, 7) : 'legacy';
+                return mKey === selectedMonth;
+            }).reverse();
+
+            if(filtered.length === 0) {
+                archiveList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">Keine Einträge für diesen Zeitraum.</p>';
+            } else {
+                archiveList.innerHTML = filtered.map(l => `
+                    <div style="display:flex; justify-content:between; padding:8px 0; border-bottom:1px solid var(--panel-brd); font-size:13px;">
+                        <span style="color:var(--text-mut);">${l.date}</span>
+                        <strong style="color:var(--text-main); margin-left:auto;">${l.value.toFixed(1)} kg</strong>
+                    </div>
+                `).join('');
+            }
         }
 
         function renderWeightLineChart() {
             const svg = document.getElementById('weight-line-svg'); 
             if(!svg) return;
             svg.innerHTML = '';
-            if(!appData.weight.length) { svg.innerHTML = `<text x="200" y="90" text-anchor="middle" fill="var(--text-mut)" font-size="12">Keine Gewichtsdaten</text>`; return; }
+            if(!appData.weight || !appData.weight.length) { svg.innerHTML = `<text x="200" y="90" text-anchor="middle" fill="var(--text-mut)" font-size="12">Keine Gewichtsdaten</text>`; return; }
 
             const logs = appData.weight.slice(-10);
             const values = logs.map(l => l.value);
@@ -957,7 +1168,6 @@
                 document.body.style.removeProperty('--accent');
                 document.body.style.removeProperty('--chart-line');
             }
-            
             save(); 
         }
 
@@ -984,29 +1194,5 @@
             draw();
         }
     </script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Loopie PWA bereit!', reg))
-            .catch(err => console.log('Fehler beim PWA-Registrieren', err));
-        });
-      }
-    </script>
-    <script>
-  // Prüft, ob der Browser Service Worker überhaupt unterstützt
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then((reg) => {
-          console.log('Loopie Service Worker erfolgreich registriert!', reg.scope);
-        })
-        .catch((err) => {
-          console.error('Service Worker Registrierung fehlgeschlagen:', err);
-        });
-    });
-  }
-</script>
-
 </body>
 </html>
