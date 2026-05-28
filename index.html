@@ -12,6 +12,7 @@
         body.theme-dark-classic { --bg-dark: #0f1115; --panel-bg: #161920; --panel-brd: #222733; --text-main: #f3f4f6; --text-mut: #6c7a89; --accent: #3b82f6; --panel-done: #1c2330; --chart-line: #3b82f6; --chart-grid: #222733; --color-empty: #242936; }
         body.theme-light-clean { --bg-dark: #f8fafc; --panel-bg: #ffffff; --panel-brd: #e2e8f0; --text-main: #0f172a; --text-mut: #64748b; --accent: #2563eb; --panel-done: #f1f5f9; --chart-line: #2563eb; --chart-grid: #e2e8f0; --color-empty: #e2e8f0; }
         body.theme-nordic-frost { --bg-dark: #1e293b; --panel-bg: #334155; --panel-brd: #475569; --text-main: #f8fafc; --text-mut: #94a3b8; --accent: #38bdf8; --panel-done: #1e293b; --chart-line: #38bdf8; --chart-grid: #475569; --color-empty: #475569; }
+        body.theme-summer-vibes { --bg-dark: #fffbeb; --panel-bg: #ffffff; --panel-brd: #fde68a; --text-main: #1e3a8a; --text-mut: #0284c7; --accent: #f97316; --panel-done: #fef3c7; --chart-line: #f97316; --chart-grid: #fde68a; --color-empty: #e0f2fe; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 95px; min-height: 100vh; transition: background 0.3s, color 0.3s; }
@@ -51,7 +52,7 @@
         .btn-check-neg { border-color: #ef4444; }
         .habit-item.completed .btn-check-neg { border-color: #ef4444; background: #ef4444; }
         
-        .btn-joker-use { background: transparent; border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .btn-joker-use { background: transparent; border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: gap: 4px; }
         .btn-counter { background: var(--bg-dark); border: 1px solid var(--panel-brd); color: var(--text-main); padding: 4px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
 
         /* Emote Inventar */
@@ -219,15 +220,12 @@
                 <div class="weight-chart-wrapper"><svg id="weight-line-svg" viewBox="0 0 400 180" style="width: 100%; height: auto; display: block; overflow: visible;"></svg></div>
             </div>
 
-            <!-- NEU: GEWICHTS ANALYSE METRIKEN DIREKT UNTER DEM INPUT/CHART -->
             <h2>📊 Gewichts-Analyse</h2>
             <div class="stats-grid" id="weight-analysis-grid"></div>
 
-            <!-- NEU: AKTUELLE HISTORIE (LETZTE 30) -->
             <h2>📋 Aktuelle Einträge (Max. 30)</h2>
             <div class="card" id="weight-recent-list" style="max-height: 250px; overflow-y: auto; padding: 4px 12px;"></div>
 
-            <!-- NEU: HISTORIE ARCHIV MIT MONATSAUSWAHL FÜR ÄLTERE DATEN -->
             <h2>🗄️ Historie Archiv</h2>
             <div class="card">
                 <label style="font-size:11px; color:var(--text-mut); text-transform:uppercase; font-weight:bold; display:block; margin-bottom:6px;">Monat wählen:</label>
@@ -262,7 +260,6 @@
                 <button class="btn-prime" onclick="createHabit()">Habit hinzufügen</button>
             </div>
 
-            <!-- ERWEITERT: HABITS VERWALTEN & INLINE UMBENENNEN -->
             <div class="card">
                 <h3 style="font-size: 14px; margin-bottom: 10px;">⚙️ Habits bearbeiten & umbenennen</h3>
                 <div id="manage-list-container" style="display:flex; flex-direction:column; gap:8px;"></div>
@@ -275,6 +272,7 @@
                     <option value="theme-dark-classic">Dunkel Klassisch</option>
                     <option value="theme-light-clean">Hell & Clean</option>
                     <option value="theme-nordic-frost">Nordisches Eis</option>
+                    <option value="theme-summer-vibes">Sommer Vibes ☀️</option>
                 </select>
 
                 <h3 style="margin-top: 20px; margin-bottom:12px; font-size:14px; border-bottom: 1px solid var(--panel-brd); padding-bottom: 5px;">🎨 Eigene App-Farben (Optional)</h3>
@@ -297,6 +295,11 @@
         </div>
     </div>
 
+    <div id="update-banner" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; font-family: sans-serif; align-items: center; gap: 15px;">
+        <span>Neues Update verfügbar!</span>
+        <button id="reload-btn" style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Jetzt aktualisieren</button>
+    </div>
+
     <nav class="nav-bar">
         <button class="nav-item active" onclick="switchView('today')">
             <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>Heute
@@ -316,6 +319,38 @@
     </nav>
 
     <script>
+        // Service Worker Registrierung und Update-Banner Logik
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then((reg) => {
+                if (reg.waiting) { showUpdateBanner(reg.waiting); }
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            showUpdateBanner(newWorker);
+                        }
+                    });
+                });
+            });
+
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
+            });
+        }
+
+        function showUpdateBanner(worker) {
+            const banner = document.getElementById('update-banner');
+            const button = document.getElementById('reload-btn');
+            banner.style.display = 'flex';
+            button.addEventListener('click', () => {
+                worker.postMessage('skipWaiting');
+            });
+        }
+
         // ================= DATA & INIT =================
         let appData = { habits: [], history: {}, weight: [], emotes: [], jokers: 0, streak: 0, bestStreak: 0, xp: 0, level: 1, settings: { resetTime: 3, theme: 'theme-dark-classic' } };
         
@@ -446,7 +481,6 @@
             switchView('today');
         }
 
-        // NEUE FUNKTION: HABIT UMBENENNEN OHNE LÖSCHEN
         function renameHabit(id) {
             const input = document.getElementById(`rename-input-${id}`);
             if(!input) return;
@@ -520,7 +554,6 @@
             const wasCompleted = getHabitStatus(h, todayStr);
 
             if(h.mode === 'counter') {
-                // ANGEPASST: DYNAMISCHE STRATEGISCHE SCHRITTE JE NACH SKALA (und so weiter)
                 let step = 1;
                 if (h.target <= 10) step = 1;
                 else if (h.target <= 100) step = 10;
@@ -683,7 +716,6 @@
                 if (isCompleted) { if(cList) cList.appendChild(item); } else { if(pList) pList.appendChild(item); }
             });
 
-            // RENDERING FÜR MANAGEMENT / UMBENENNEN IM SETUP
             if(mList) {
                 appData.habits.forEach(h => {
                     const mItem = document.createElement('div');
@@ -704,7 +736,6 @@
             renderInventar();
             if(document.getElementById('view-calendar').classList.contains('active')) renderCalendarTab();
             
-            // RENDERING GEWICHTS MODULE
             renderWeightLineChart();
             renderWeightAnalysisModule();
             renderWeightHistoryLists();
@@ -819,7 +850,6 @@
                             renderedDays++;
                         }
                     } else {
-                        // ANGEPASST: JOKER ANZEIGE IN GELB MIT ICON FÜR HABIT-SPEZIFISCHE KALENDER
                         let dayRecord = appData.history[dStr];
                         let task = dayRecord ? dayRecord[habit.id] : null;
                         
@@ -862,7 +892,6 @@
                             txtColor = '#fff';
                         } else { opacity = 0.3; }
                     } else {
-                        // ANGEPASST: JOKER HIGHLIGHT IM MONATSKALENDER
                         let dayRecord = appData.history[dStr];
                         let task = dayRecord ? dayRecord[habit.id] : null;
 
@@ -902,7 +931,6 @@
                             renderedDays++;
                         } else { opacity = 0.2; }
                     } else {
-                        // ANGEPASST: JOKER ERKENNUNG IM JAHRESMATRIX (GELBER PUNKT)
                         let dayRecord = appData.history[dStr];
                         let task = dayRecord ? dayRecord[habit.id] : null;
 
@@ -964,9 +992,8 @@
             const val = parseFloat(document.getElementById('weight-input').value);
             if(!val) return;
             
-            // Vollständige zeitbasierte Keys & Labels generieren
             const now = new Date();
-            const dateKey = formatDateLocal(now); // YYYY-MM-DD Format für lückenlose Auswertung
+            const dateKey = formatDateLocal(now); 
             const label = now.toLocaleDateString('de-DE', {day: '2-digit', month: 'short'});
             
             appData.weight.push({ 
@@ -980,7 +1007,6 @@
             renderAll();
         }
 
-        // NEU: ANALYSE-WERTEMODUL (REINE KENNZAHLEN, KEINE SÄTZE)
         function renderWeightAnalysisModule() {
             const grid = document.getElementById('weight-analysis-grid');
             if(!grid) return;
@@ -1011,7 +1037,6 @@
             `;
         }
 
-        // NEU: HISTORIE SPRACH- & MONATSSPLIT (30 NEUESTE VS RESTE IM ARCHIV)
         function renderWeightHistoryLists() {
             const recentList = document.getElementById('weight-recent-list');
             const select = document.getElementById('weight-history-month-select');
@@ -1019,12 +1044,9 @@
             if(!recentList) return;
 
             const allLogs = [...appData.weight];
-            // Die letzten 30 eingetragenen Werte (neueste zuerst)
             const recentLogs = allLogs.slice(-30).reverse();
-            // Alle restlichen Werte wandern in die Archiv-Masse
             const archiveLogs = allLogs.slice(0, Math.max(0, allLogs.length - 30));
 
-            // Aktuelle 30 rendern
             if(recentLogs.length === 0) {
                 recentList.innerHTML = '<p style="color:var(--text-mut); font-size:13px; text-align:center; padding:10px;">Noch keine Gewichtsdaten erfasst.</p>';
             } else {
@@ -1036,12 +1058,10 @@
                 `).join('');
             }
 
-            // Dropdown für Archiv befüllen
             const prevSelected = select ? select.value : '';
             if(select) {
                 const monthsMap = {};
                 archiveLogs.forEach(l => {
-                    // Falls legacy Daten kein dateKey besitzen, Fallback ermitteln
                     let key = l.dateKey ? l.dateKey.substring(0, 7) : 'legacy';
                     monthsMap[key] = true;
                 });
