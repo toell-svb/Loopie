@@ -1,4 +1,4 @@
-const CACHE_NAME = 'loopie-cache-v3'; // Neue Version, um alten Ballast abzuwerfen
+const CACHE_NAME = 'loopie-cache-v4'; // Neue Version, um alten Ballast abzuwerfen
 
 const ASSETS = [
   './',
