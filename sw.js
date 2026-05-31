@@ -1,4 +1,4 @@
-const CACHE_NAME = 'loopie-cache-v4'; // Neue Version, um alten Ballast abzuwerfen
+const CACHE_NAME = 'loopie-cache-v5'; // Neue Version für das Backup- & Reminder-Update
 
 const ASSETS = [
   './',
@@ -32,9 +32,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Strategie: "Stale-While-Revalidate" (Perfekt für dich!)
-// Lädt die App blitzschnell aus dem Cache (auch offline), 
-// sucht aber im HINTERGRUND sofort online nach Updates für die index.html.
+// 3. Strategie: "Stale-While-Revalidate" (Perfekt für Loopie!)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
