@@ -1,4 +1,4 @@
-const CACHE_NAME = 'loopie-cache-v7'; // Neue Version für das Backup- & Reminder-Update
+const CACHE_NAME = 'loopie-cache-v8'; // Neue Version für das Backup- & Reminder-Update
 
 const ASSETS = [
   './',
