@@ -281,6 +281,57 @@
             .calorie-week-balance { grid-template-columns:1fr; }
         }
 
+        /* ================= QUIT TIMER ================= */
+        .quit-config { display:none; margin:10px 0 12px; padding:12px; border:1px solid rgba(16,185,129,.28); border-radius:14px; background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(59,130,246,.05)); }
+        .quit-config.open { display:block; }
+        .quit-config-title { font-size:12px; font-weight:900; margin-bottom:8px; }
+        .quit-config-note { font-size:9px; color:var(--text-mut); line-height:1.45; margin-top:6px; }
+        .quit-date-row { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+        .quit-date-row > div { min-width:0; }
+        .quit-switch { display:flex; align-items:center; gap:8px; font-size:10px; font-weight:800; color:var(--text-main); margin-bottom:8px; cursor:pointer; }
+        .quit-switch input { width:18px; height:18px; margin:0; accent-color:#10b981; }
+        .quit-habit-card { position:relative; overflow:hidden; display:block; padding:14px; border-radius:16px; margin-bottom:10px; background:linear-gradient(145deg,rgba(16,185,129,.10),rgba(59,130,246,.06)); border:1px solid var(--panel-brd); }
+        .quit-habit-card::after { content:''; position:absolute; width:120px; height:120px; right:-55px; top:-55px; border-radius:50%; background:#10b981; opacity:.06; pointer-events:none; }
+        .quit-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+        .quit-title-wrap { min-width:0; flex:1; }
+        .quit-title { font-size:15px; font-weight:900; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+        .quit-sub { color:var(--text-mut); font-size:9px; margin-top:4px; }
+        .quit-live-pill { white-space:nowrap; font-size:9px; font-weight:900; color:#10b981; background:rgba(16,185,129,.12); border:1px solid rgba(16,185,129,.28); padding:5px 7px; border-radius:999px; }
+        .quit-timer { font-variant-numeric:tabular-nums; font-size:30px; line-height:1; font-weight:950; letter-spacing:.5px; text-align:center; margin:15px 0 7px; }
+        .quit-timer-label { text-align:center; color:var(--text-mut); font-size:9px; text-transform:uppercase; letter-spacing:.7px; font-weight:800; }
+        .quit-progress-track { height:9px; border-radius:999px; overflow:hidden; background:var(--bg-dark); border:1px solid var(--panel-brd); margin-top:12px; }
+        .quit-progress-fill { height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg,#10b981,var(--accent)); transition:width .35s ease; }
+        .quit-next { text-align:center; color:var(--text-mut); font-size:10px; margin-top:7px; }
+        .quit-stats { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:11px; }
+        .quit-stat { background:var(--bg-dark); border:1px solid var(--panel-brd); border-radius:10px; padding:8px; text-align:center; }
+        .quit-stat span { display:block; color:var(--text-mut); font-size:8px; text-transform:uppercase; font-weight:800; }
+        .quit-stat strong { display:block; font-size:13px; margin-top:3px; }
+        .quit-actions { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:10px; }
+        .quit-action-btn { border:1px solid var(--panel-brd); background:var(--bg-dark); color:var(--text-main); border-radius:10px; padding:10px 8px; cursor:pointer; font-size:10px; font-weight:900; }
+        .quit-action-btn.primary { background:#10b981; border-color:#10b981; color:#052e22; }
+        .quit-action-btn.danger { border-color:rgba(239,68,68,.5); color:#ef4444; }
+        .quit-why { margin-top:10px; padding:10px; border:1px dashed var(--panel-brd); border-radius:11px; font-size:10px; color:var(--text-mut); line-height:1.45; }
+        .quit-why strong { color:var(--text-main); }
+        .quit-trophy-row { display:flex; gap:6px; overflow-x:auto; padding:9px 1px 1px; }
+        .quit-trophy { flex:0 0 auto; min-width:53px; text-align:center; border:1px solid var(--panel-brd); background:var(--bg-dark); border-radius:10px; padding:6px 5px; opacity:.52; }
+        .quit-trophy.earned { opacity:1; border-color:rgba(245,158,11,.4); background:rgba(245,158,11,.08); }
+        .quit-trophy-icon { font-size:17px; }
+        .quit-trophy-days { font-size:8px; color:var(--text-mut); margin-top:2px; }
+        .quit-trigger-log { margin-top:9px; font-size:9px; color:var(--text-mut); }
+        .quit-trigger-chip { display:inline-block; margin:4px 4px 0 0; padding:4px 6px; border-radius:999px; background:var(--bg-dark); border:1px solid var(--panel-brd); }
+        .quit-modal { position:fixed; inset:0; z-index:1200; background:rgba(0,0,0,.68); display:none; align-items:flex-end; justify-content:center; padding:14px; }
+        .quit-modal.open { display:flex; }
+        .quit-modal-card { width:min(100%,430px); background:var(--panel-bg); border:1px solid var(--panel-brd); border-radius:20px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,.4); }
+        .quit-modal-card h3 { font-size:16px; margin-bottom:6px; }
+        .quit-modal-card p { font-size:10px; color:var(--text-mut); line-height:1.45; margin-bottom:10px; }
+        .breathing-circle { width:130px; height:130px; margin:14px auto; border-radius:50%; display:flex; align-items:center; justify-content:center; text-align:center; background:radial-gradient(circle at 35% 35%,rgba(16,185,129,.38),rgba(59,130,246,.12)); border:1px solid rgba(16,185,129,.35); font-size:14px; font-weight:900; transition:transform 4s ease-in-out; }
+        .breathing-circle.breathe-in { transform:scale(1.18); }
+        .breathing-circle.breathe-out { transform:scale(.82); }
+        @media (max-width:420px) {
+            .quit-timer { font-size:25px; }
+            .quit-date-row { grid-template-columns:1fr; }
+        }
+
         .view { display: none; }
         .view.active { display: block; animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -354,6 +405,42 @@
     <div id="emote-modal" onclick="this.style.display='none'">
         <div class="emote-pop" id="emote-display">🦄</div>
         <p style="color:white; font-weight:bold; margin-top:20px;">Neues Emote gefunden!</p>
+    </div>
+
+    <div id="quit-relapse-modal" class="quit-modal" onclick="if(event.target===this) closeQuitRelapseModal()">
+        <div class="quit-modal-card">
+            <h3>↻ Rückfall eintragen</h3>
+            <p>Der aktuelle Quit-Timer wird auf <strong>00:00:00</strong> zurückgesetzt. Dein persönlicher Rekord und bereits verdiente Trophäen bleiben erhalten.</p>
+            <label class="form-label">Optionaler Trigger</label>
+            <select id="quit-relapse-reason" style="margin-bottom:8px;">
+                <option value="">Kein Grund / überspringen</option>
+                <option value="Stress">Stress</option>
+                <option value="Sozialer Druck">Sozialer Druck</option>
+                <option value="Müdigkeit">Müdigkeit</option>
+                <option value="Langeweile">Langeweile</option>
+                <option value="Gewohnheit">Gewohnheit</option>
+                <option value="Craving">Craving</option>
+                <option value="Sonstiges">Sonstiges</option>
+            </select>
+            <input id="quit-relapse-custom" type="text" maxlength="80" placeholder="Optionaler eigener Trigger …" style="margin-bottom:8px;">
+            <div class="quit-actions">
+                <button class="quit-action-btn" onclick="closeQuitRelapseModal()">Abbrechen</button>
+                <button class="quit-action-btn danger" onclick="confirmQuitRelapse()">Rückfall speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quit-breathing-modal" class="quit-modal" onclick="if(event.target===this) closeQuitBreathing()">
+        <div class="quit-modal-card" style="text-align:center;">
+            <h3>🫁 60-Sekunden-Atemübung</h3>
+            <p>Bleib nur für die nächste Minute bei dir. Langsam einatmen, kurz halten, langsam ausatmen.</p>
+            <div id="breathing-circle" class="breathing-circle">Bereit</div>
+            <div id="breathing-countdown" style="font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;">60</div>
+            <div class="quit-actions">
+                <button class="quit-action-btn" onclick="closeQuitBreathing()">Schließen</button>
+                <button class="quit-action-btn primary" onclick="startQuitBreathing()">60 Sekunden starten</button>
+            </div>
+        </div>
     </div>
 
     <div class="container">
@@ -614,7 +701,20 @@
                     <option value="counter">Zähler (Mengen tracken)</option>
                     <option value="flex">Flexibel (Wochenziel)</option>
                     <option value="negative">Negativ (Aufhören / Vermeiden)</option>
+                    <option value="quit">Quit-Timer (Zeit seit Rückfall)</option>
                 </select>
+
+                <div id="quit-config" class="quit-config">
+                    <div class="quit-config-title">⏱️ Quit-Timer konfigurieren</div>
+                    <label class="quit-switch"><input type="checkbox" id="quit-start-now" checked onchange="toggleQuitStartInput()"> Sofort ab jetzt starten</label>
+                    <div id="quit-start-at-wrap">
+                        <label class="form-label">Startdatum & Uhrzeit</label>
+                        <input type="datetime-local" id="quit-start-at" style="margin:0;">
+                    </div>
+                    <label class="form-label" style="margin-top:9px;">Warum hältst du durch?</label>
+                    <input type="text" id="quit-why" maxlength="180" placeholder="z. B. Für meine Gesundheit, meine Familie …" style="margin:0;">
+                    <div class="quit-config-note">Der Timer zeigt ausschließlich Zeitfortschritt. Geld, Ersparnisse oder finanzielle Werte werden für Quit-Habits nicht verwendet.</div>
+                </div>
 
                 <div id="target-box" style="display: none; margin-bottom:12px;">
                     <label id="target-label" style="font-size: 11px; font-weight:bold; color: var(--text-mut); text-transform:uppercase; display:block;">Zielwert:</label>
@@ -770,10 +870,13 @@
                 if(loaded.habits) {
                     loaded.habits.forEach(h => {
                         if(!h.createdAt) h.createdAt = '2020-01-01'; 
-                        if(h.mode === 'counter' && !h.target) h.target = 1; 
+                        if(h.mode === 'counter' && !h.target) h.target = 1;
+                        if(h.mode === 'quit') normalizeQuitHabit(h);
                     });
                 }
                 appData = { ...appData, ...loaded };
+                if(!Array.isArray(appData.habits)) appData.habits=[];
+                appData.habits.forEach(h => { if(h.mode==='quit') normalizeQuitHabit(h); });
                 if(!appData.emotes) appData.emotes = [];
                 if(!appData.jokers) appData.jokers = 0;
                 if(!appData.weight) appData.weight = [];
@@ -828,6 +931,9 @@
             checkDayReset(); 
             updateCalDropdown();
             renderAll();
+            updateQuitTimers();
+            if(window.__quitTimerInterval) clearInterval(window.__quitTimerInterval);
+            window.__quitTimerInterval=setInterval(updateQuitTimers,1000);
             checkAndShowNotification(); // Reminder-Prüfung nach dem Laden ausführen
         }
 
@@ -897,7 +1003,8 @@
             const mode = document.getElementById('habit-mode').value;
             const targetBox = document.getElementById('target-box');
             const targetLabel = document.getElementById('target-label');
-            
+            const quitConfig = document.getElementById('quit-config');
+            if(quitConfig) quitConfig.classList.toggle('open', mode === 'quit');
             if (mode === 'counter') {
                 targetBox.style.display = 'block';
                 targetLabel.innerText = 'Zielwert (Menge):';
@@ -907,6 +1014,18 @@
             } else {
                 targetBox.style.display = 'none';
             }
+            if(mode === 'quit') toggleQuitStartInput();
+        }
+
+        function toggleQuitStartInput(){
+            const nowBox=document.getElementById('quit-start-now');
+            const wrap=document.getElementById('quit-start-at-wrap');
+            if(wrap) wrap.style.display=nowBox?.checked?'none':'block';
+            const input=document.getElementById('quit-start-at');
+            if(input && !input.value){
+                const d=new Date(Date.now()-new Date().getTimezoneOffset()*60000);
+                input.value=d.toISOString().slice(0,16);
+            }
         }
 
         function createHabit() {
@@ -915,14 +1034,28 @@
             const target = parseInt(document.getElementById('habit-target').value) || 1;
 
             if(!name) return alert('Bitte gib einen Namen an!');
-            appData.habits.push({
-                id: 'h_' + Date.now(), name: name, color: selectedColor, mode: mode,
+            const id='h_' + Date.now();
+            const habit={
+                id, name: name, color: selectedColor, mode: mode,
                 target: (mode === 'counter' || mode === 'flex') ? target : 1,
                 createdAt: getLogicalDateStr()
-            });
-            save(); 
+            };
+            if(mode==='quit'){
+                const startNow=document.getElementById('quit-start-now')?.checked;
+                let startAt=startNow?Date.now():new Date(document.getElementById('quit-start-at')?.value||'').getTime();
+                if(!Number.isFinite(startAt)) return alert('Bitte ein gültiges Startdatum und eine Uhrzeit wählen.');
+                if(startAt>Date.now()) return alert('Der Startzeitpunkt darf nicht in der Zukunft liegen.');
+                const why=document.getElementById('quit-why')?.value.trim()||'';
+                habit.createdAt=formatDateLocal(new Date(startAt));
+                habit.quit={version:1,startAt,bestSeconds:0,relapseLog:[],earnedMilestones:[],why};
+            }
+            appData.habits.push(habit);
+            save();
             document.getElementById('habit-name').value = '';
             document.getElementById('habit-target').value = '1';
+            document.getElementById('quit-why').value='';
+            document.getElementById('quit-start-now').checked=true;
+            toggleFormInputs();
             switchView('today');
         }
 
@@ -939,7 +1072,191 @@
             }
         }
 
+        const QUIT_MILESTONES = [
+            {seconds:24*60*60, label:'24 Stunden', short:'24h', icon:'🌱', xp:20},
+            {seconds:3*24*60*60, label:'3 Tage', short:'3T', icon:'🥉', xp:30},
+            {seconds:7*24*60*60, label:'1 Woche', short:'7T', icon:'🔥', xp:50},
+            {seconds:30*24*60*60, label:'1 Monat', short:'30T', icon:'💎', xp:75},
+            {seconds:100*24*60*60, label:'100 Tage', short:'100T', icon:'🏆', xp:100},
+            {seconds:365*24*60*60, label:'1 Jahr', short:'1J', icon:'👑', xp:150}
+        ];
+
+        function normalizeQuitHabit(h){
+            if(!h || h.mode!=='quit') return h;
+            if(!h.quit || typeof h.quit!=='object') h.quit={};
+            if(!Number.isFinite(Number(h.quit.startAt))){
+                const parsed=new Date(h.createdAt||Date.now()).getTime();
+                h.quit.startAt=Number.isFinite(parsed)?parsed:Date.now();
+            }
+            if(!Number.isFinite(Number(h.quit.bestSeconds)) || Number(h.quit.bestSeconds)<0) h.quit.bestSeconds=0;
+            if(!Array.isArray(h.quit.relapseLog)) h.quit.relapseLog=[];
+            if(!Array.isArray(h.quit.earnedMilestones)) h.quit.earnedMilestones=[];
+            if(typeof h.quit.why!=='string') h.quit.why='';
+            return h;
+        }
+
+        function getQuitElapsedSeconds(h, now=Date.now()){
+            normalizeQuitHabit(h);
+            return Math.max(0, Math.floor((now-Number(h.quit.startAt))/1000));
+        }
+
+        function formatQuitDuration(totalSeconds){
+            const s=Math.max(0,Math.floor(Number(totalSeconds)||0));
+            const days=Math.floor(s/86400);
+            const hours=Math.floor((s%86400)/3600);
+            const mins=Math.floor((s%3600)/60);
+            const secs=s%60;
+            return `${days} Tage, ${String(hours).padStart(2,'0')} Stunden, ${String(mins).padStart(2,'0')} Minuten, ${String(secs).padStart(2,'0')} Sekunden`;
+        }
+
+        function formatQuitCompact(totalSeconds){
+            const s=Math.max(0,Math.floor(Number(totalSeconds)||0));
+            const days=Math.floor(s/86400);
+            const hours=Math.floor((s%86400)/3600);
+            const mins=Math.floor((s%3600)/60);
+            const secs=s%60;
+            return `${days}T ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        }
+
+        function getLogicalDateFromTimestamp(ts){
+            const d=new Date(Number(ts));
+            if(!Number.isFinite(d.getTime())) return '';
+            const boundary=appData.settings?.resetTime||3;
+            if(d.getHours()<boundary) d.setDate(d.getDate()-1);
+            return formatDateLocal(d);
+        }
+
+        function getQuitDayStatus(h,dateStr){
+            normalizeQuitHabit(h);
+            const startDate=getLogicalDateFromTimestamp(h.quit.startAt);
+            if(!startDate || dateStr<startDate || dateStr>getLogicalDateStr()) return null;
+            const relapseToday=h.quit.relapseLog.some(r=>getLogicalDateFromTimestamp(r.at)===dateStr);
+            return !relapseToday;
+        }
+
+        function getQuitNextMilestone(h){
+            normalizeQuitHabit(h);
+            const elapsed=getQuitElapsedSeconds(h);
+            return QUIT_MILESTONES.find(m=>elapsed<m.seconds)||null;
+        }
+
+        function checkQuitMilestones(h, silent=false){
+            if(!h || h.mode!=='quit') return;
+            normalizeQuitHabit(h);
+            const elapsed=getQuitElapsedSeconds(h);
+            let changed=false;
+            QUIT_MILESTONES.forEach(m=>{
+                if(elapsed>=m.seconds && !h.quit.earnedMilestones.includes(m.seconds)){
+                    h.quit.earnedMilestones.push(m.seconds);
+                    appData.xp+=m.xp;
+                    changed=true;
+                    if(!silent){
+                        setTimeout(()=>{showMilestoneToast(`${m.icon} ${m.label}`,`${h.name}: ${m.label} erreicht – +${m.xp} XP und Trophäe dauerhaft gesammelt!`); triggerConfetti();},120);
+                    }
+                }
+            });
+            if(changed){
+                appData.level=Math.floor(appData.xp/100)+1;
+                save();
+            }
+        }
+
+        function updateQuitTimers(){
+            document.querySelectorAll('[data-quit-timer]').forEach(el=>{
+                const h=appData.habits.find(x=>x.id===el.dataset.quitTimer);
+                if(!h || h.mode!=='quit') return;
+                checkQuitMilestones(h);
+                const elapsed=getQuitElapsedSeconds(h);
+                el.textContent=formatQuitDuration(elapsed);
+                const next=getQuitNextMilestone(h);
+                const card=document.querySelector(`[data-quit-card="${h.id}"]`);
+                if(card){
+                    const progress=card.querySelector('[data-quit-progress]');
+                    const nextText=card.querySelector('[data-quit-next]');
+                    const last=QUIT_MILESTONES.filter(m=>elapsed>=m.seconds).slice(-1)[0];
+                    if(progress && next){
+                        const from=last?last.seconds:0;
+                        progress.style.width=Math.max(0,Math.min(100,((elapsed-from)/(next.seconds-from))*100))+'%';
+                    } else if(progress) progress.style.width='100%';
+                    if(nextText){
+                        nextText.textContent=next?`Noch ${formatQuitDuration(next.seconds-elapsed)} bis zum ${next.label}-Meilenstein`:'🎉 Alle Zeit-Meilensteine erreicht';
+                    }
+                    const bestEl=card.querySelector('[data-quit-best]');
+                    if(bestEl) bestEl.textContent=formatQuitDuration(Math.max(Number(h.quit.bestSeconds)||0,elapsed));
+                }
+            });
+        }
+
+        function openQuitRelapseModal(id){
+            document.getElementById('quit-relapse-modal').dataset.habitId=id;
+            document.getElementById('quit-relapse-reason').value='';
+            document.getElementById('quit-relapse-custom').value='';
+            document.getElementById('quit-relapse-modal').classList.add('open');
+        }
+
+        function closeQuitRelapseModal(){ document.getElementById('quit-relapse-modal')?.classList.remove('open'); }
+
+        function confirmQuitRelapse(){
+            const modal=document.getElementById('quit-relapse-modal');
+            const id=modal?.dataset.habitId;
+            const h=appData.habits.find(x=>x.id===id);
+            if(!h || h.mode!=='quit') return closeQuitRelapseModal();
+            normalizeQuitHabit(h);
+            const now=Date.now();
+            const elapsed=getQuitElapsedSeconds(h,now);
+            h.quit.bestSeconds=Math.max(Number(h.quit.bestSeconds)||0,elapsed);
+            const select=document.getElementById('quit-relapse-reason').value;
+            const custom=document.getElementById('quit-relapse-custom').value.trim();
+            const reason=custom||select||'';
+            h.quit.relapseLog.push({at:now,reason});
+            h.quit.startAt=now;
+            save();
+            closeQuitRelapseModal();
+            recalcStreaks();
+            renderAll();
+        }
+
+        function openQuitBreathing(id){
+            const h=appData.habits.find(x=>x.id===id);
+            const modal=document.getElementById('quit-breathing-modal');
+            if(!h || !modal) return;
+            modal.dataset.habitId=id;
+            modal.classList.add('open');
+            document.getElementById('breathing-countdown').textContent='60';
+            document.getElementById('breathing-circle').textContent='Bereit';
+            document.getElementById('breathing-circle').className='breathing-circle';
+        }
+
+        let quitBreathingTimer=null;
+        function startQuitBreathing(){
+            if(quitBreathingTimer) clearInterval(quitBreathingTimer);
+            let remaining=60, phase=0;
+            const circle=document.getElementById('breathing-circle');
+            const count=document.getElementById('breathing-countdown');
+            const tick=()=>{
+                count.textContent=remaining;
+                phase++;
+                const inPhase=(phase%8)<4;
+                circle.className='breathing-circle '+(inPhase?'breathe-in':'breathe-out');
+                circle.textContent=inPhase?'Einatmen':'Ausatmen';
+                if(remaining<=0){ clearInterval(quitBreathingTimer); quitBreathingTimer=null; circle.className='breathing-circle'; circle.textContent='Geschafft'; count.textContent='0'; return; }
+                remaining--;
+            };
+            phase=-1; tick(); quitBreathingTimer=setInterval(tick,1000);
+        }
+
+        function closeQuitBreathing(){
+            if(quitBreathingTimer) clearInterval(quitBreathingTimer);
+            quitBreathingTimer=null;
+            document.getElementById('quit-breathing-modal')?.classList.remove('open');
+        }
+
         function getFirstUsedDate(habitId) {
+            const habit=appData.habits.find(h=>h.id===habitId);
+            if(habit?.mode==='quit'){
+                normalizeQuitHabit(habit);
+                return getLogicalDateFromTimestamp(habit.quit.startAt);
+            }
             let firstDate = null;
             for (let dateStr in appData.history) {
                 let task = appData.history[dateStr][habitId];
@@ -959,6 +1276,7 @@
             const task = dayRecord ? dayRecord[h.id] : null;
             
             if (task?.joker) return true;
+            if (h.mode === 'quit') return getQuitDayStatus(h,dateStr);
             if (h.mode === 'negative') {
                 if (dateStr < getLogicalDateStr() && (!dayRecord || !task)) {
                     return null;
@@ -993,6 +1311,7 @@
             const task = appData.history[todayStr][id];
 
             const wasCompleted = getHabitStatus(h, todayStr);
+            if(h.mode === 'quit') return;
             if(h.mode === 'counter') {
                 let step = 1;
                 if (h.target <= 10) step = 1;
@@ -1142,6 +1461,53 @@
             renderCaloriesTab();
 
             appData.habits.forEach(h => {
+                if(h.mode==='quit'){
+                    normalizeQuitHabit(h);
+                    checkQuitMilestones(h);
+                    const elapsed=getQuitElapsedSeconds(h);
+                    const next=getQuitNextMilestone(h);
+                    const last=QUIT_MILESTONES.filter(m=>elapsed>=m.seconds).slice(-1)[0];
+                    const from=last?last.seconds:0;
+                    const progress=next?Math.max(0,Math.min(100,((elapsed-from)/(next.seconds-from))*100)):100;
+                    const best=Math.max(Number(h.quit.bestSeconds)||0,elapsed);
+                    if(elapsed>Number(h.quit.bestSeconds||0)){ h.quit.bestSeconds=elapsed; }
+                    const card=document.createElement('div');
+                    card.className='quit-habit-card';
+                    card.dataset.quitCard=h.id;
+                    card.style.borderLeft=`5px solid ${h.color}`;
+                    const trophies=QUIT_MILESTONES.map(m=>{
+                        const earned=h.quit.earnedMilestones.includes(m.seconds);
+                        return `<div class="quit-trophy ${earned?'earned':''}" title="${m.label}"><div class="quit-trophy-icon">${earned?m.icon:'🔒'}</div><div class="quit-trophy-days">${m.short}</div></div>`;
+                    }).join('');
+                    const triggers=h.quit.relapseLog.slice(-4).reverse().filter(r=>r.reason).map(r=>`<span class="quit-trigger-chip">${escapeHtml(r.reason)}</span>`).join('');
+                    card.innerHTML=`
+                        <div class="quit-head">
+                            <div class="quit-title-wrap">
+                                <div class="quit-title">⏱️ ${escapeHtml(h.name)} <span class="badge" style="background:rgba(16,185,129,.12);color:#10b981;">Quit-Timer</span></div>
+                                <div class="quit-sub">Seit ${new Date(h.quit.startAt).toLocaleString('de-DE',{dateStyle:'medium',timeStyle:'short'})}</div>
+                            </div>
+                            <span class="quit-live-pill">● LIVE</span>
+                        </div>
+                        <div class="quit-timer" data-quit-timer="${h.id}">${formatQuitDuration(elapsed)}</div>
+                        <div class="quit-timer-label">Jeder verstrichene Moment zählt</div>
+                        <div class="quit-progress-track"><div class="quit-progress-fill" data-quit-progress style="width:${progress}%;"></div></div>
+                        <div class="quit-next" data-quit-next>${next?`Noch ${formatQuitDuration(next.seconds-elapsed)} bis zum ${next.label}-Meilenstein`:'🎉 Alle Zeit-Meilensteine erreicht'}</div>
+                        <div class="quit-stats">
+                            <div class="quit-stat"><span>Persönlicher Rekord</span><strong data-quit-best>${formatQuitDuration(best)}</strong></div>
+                            <div class="quit-stat"><span>Rückfälle</span><strong>${h.quit.relapseLog.length}</strong></div>
+                        </div>
+                        <div class="quit-trophy-row">${trophies}</div>
+                        <div class="quit-actions">
+                            <button class="quit-action-btn primary" onclick="openQuitBreathing('${h.id}')">🫁 Craving · 60 Sek.</button>
+                            <button class="quit-action-btn danger" onclick="openQuitRelapseModal('${h.id}')">↻ Rückfall eintragen</button>
+                        </div>
+                        ${h.quit.why?`<div class="quit-why">💚 <strong>Warum ich durchhalte:</strong> ${escapeHtml(h.quit.why)}</div>`:''}
+                        ${triggers?`<div class="quit-trigger-log">Trigger zuletzt: ${triggers}</div>`:''}
+                    `;
+                    if(pList) pList.appendChild(card);
+                    return;
+                }
+
                 const isCompleted = getHabitStatus(h, todayStr);
                 const item = document.createElement('div');
                 item.className = `habit-item ${isCompleted ? 'completed' : ''}`;
@@ -1170,7 +1536,7 @@
 
                 item.innerHTML = `
                     <div class="habit-info">
-                        <div class="habit-title">${h.name} ${badge}</div>
+                        <div class="habit-title">${escapeHtml(h.name)} ${badge}</div>
                         <div class="habit-meta">${isCompleted ? 'Erledigt / Geschützt' : 'Offen'}</div>
                     </div>
                     <div class="habit-controls">${controlsHTML}</div>
